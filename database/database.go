@@ -48,7 +48,7 @@ func Create_Table(db *sqlx.DB) {
 
 func IsUserRegistered(db *sqlx.DB, email string) bool {
 	var userID int
-	get_user := "select password from users_data where email = $1"
+	get_user := "select user_id from users_data where email = $1"
 	db.Get(&userID, get_user, email)
 	if userID != 0 {
 		return true
