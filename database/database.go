@@ -48,8 +48,16 @@ func Create_Table(db *sqlx.DB) {
 
 func IsUserRegistered(db *sqlx.DB, email string) bool {
 	var userID int
-	get_user := "select user_id from users_data where email = $1"
-	db.Get(&userID, get_user, email)
+	get_user_id := "select user_id from users_data where email = $1"
+	row, err := db.Query(get_user_id, email)
+	if err != nil {
+		return false
+	}
+	for row.Next() {
+		if err := row.Scan(&userID); err != nil {
+			return false
+		}
+	}
 	if userID != 0 {
 		return true
 	}
@@ -59,7 +67,16 @@ func IsUserRegistered(db *sqlx.DB, email string) bool {
 func CheckPassword(db *sqlx.DB, email string, password string) error {
 	var hash_pass string
 	getusers_hash_pass := "select password from users_data where email = $1"
-	db.Get(&hash_pass, getusers_hash_pass, email)
+	row, err := db.Query(getusers_hash_pass, email)
+	if err != nil {
+		return err
+	}
+	for row.Next() {
+		if err := row.Scan(&hash_pass); err != nil {
+			return err
+		}
+	}
+
 	if err := bcrypt.CompareHashAndPassword([]byte(hash_pass), []byte(password)); err != nil {
 		if err == bcrypt.ErrMismatchedHashAndPassword {
 			return err

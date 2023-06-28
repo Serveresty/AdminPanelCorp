@@ -16,4 +16,5 @@ func All_requests(route *gin.Engine, DB *sqlx.DB) {
 	route.GET("/sign-in", handler_db.Sign_In_Page)
 	route.POST("/login-form", handler_db.Sign_In)
 	route.POST("/registration-form", handler_db.Sign_Up)
+	route.POST("/logout-form", server.Logout)
 }
