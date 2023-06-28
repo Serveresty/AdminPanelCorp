@@ -18,7 +18,7 @@ func HashPassword(password string) (string, error) {
 	return string(bytes), err
 }
 
-func Send_Email(data [][3]string) {
+func Send_Email(data [][]string) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
