@@ -4,9 +4,30 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>{{ .title }}</title>
 </head>
 <body>
+    <table>
+        <tr>
+            <th>ID</th>
+            <th>Email</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Role</th>
+            <th>Add manager role</th>
+            <th>Delete manager role</th>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button>click</button></td>
+            <td><button>click</button></td>
+        </tr>
+        {{ end }}
+    </table>
     <form action="/logout-form" method="post">
         <button type="submit">Logout</button>
     </form>

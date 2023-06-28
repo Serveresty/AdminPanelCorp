@@ -17,6 +17,7 @@ func main() {
 		DBName:   "postgres",
 		SSLMode:  "disable",
 	})
+	defer db.Close()
 
 	if err != nil {
 		log.Fatal("failed to initialize db: ", err.Error())

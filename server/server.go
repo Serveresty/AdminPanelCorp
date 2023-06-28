@@ -2,7 +2,10 @@ package server
 
 import (
 	"AdminPanelCorp/database"
+	"AdminPanelCorp/models"
 	"AdminPanelCorp/utils"
+	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -18,24 +21,26 @@ type DataBase struct {
 	Data *sqlx.DB
 }
 
-type User struct {
-	Id       int
-	Email    string
-	Username string
-	Role     string
-}
+func (db *DataBase) Home_Page(c *gin.Context) {
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		c.JSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
 
-type Claims struct {
-	Id       int
-	Username string
-	Role     string
-	jwt.StandardClaims
-}
+	claims, err := utils.ParseToken(cookie)
 
-func (db *DataBase) Panel(c *gin.Context) {
+	if err != nil {
+		c.JSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
+	if claims.Role != "" {
+
+	}
+
 	c.HTML(
 		http.StatusOK,
-		"panel.html",
+		"home_page.html",
 		gin.H{},
 	)
 }
@@ -94,7 +99,7 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 }
 
 func (db *DataBase) Sign_In(c *gin.Context) {
-	var user User
+	var user models.User
 	email := c.PostForm("email")
 	password := c.PostForm("password")
 
@@ -109,6 +114,7 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 	if err != nil {
 		return
 	}
+	defer row.Close()
 	for row.Next() {
 		if err := row.Scan(&user.Id, &user.Email, &user.Username, &user.Role); err != nil {
 			return
@@ -117,7 +123,7 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 
 	expirationTime := time.Now().Add(time.Hour * 24)
 
-	claims := &Claims{
+	claims := &models.Claims{
 		Id:       user.Id,
 		Username: user.Username,
 		Role:     user.Role,
@@ -141,4 +147,41 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 func Logout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "localhost", false, true)
 	c.JSON(200, gin.H{"success": "user logged out"})
+}
+
+func (db *DataBase) Admin_Panel(c *gin.Context) {
+	cookie, err := c.Cookie("token")
+	if err != nil {
+		c.JSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	claims, err := utils.ParseToken(cookie)
+
+	if err != nil {
+		c.JSON(401, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	if claims.Role != "admin" && claims.Role != "manager" {
+		c.JSON(401, gin.H{"error": "no permissions to access this page"})
+		return
+	}
+
+	all_users_data, err := database.GetAllUsers(db.Data)
+
+	jsonUsersData, err := json.Marshal(all_users_data)
+	if err != nil {
+		panic(err)
+	}
+
+	fmt.Printf("%s\n", jsonUsersData)
+	c.HTML(
+		http.StatusOK,
+		"panel.html",
+		gin.H{
+			"title": "Admin Panel",
+			"data":  jsonUsersData,
+		},
+	)
 }

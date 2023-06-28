@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"AdminPanelCorp/models"
 	"fmt"
 	"log"
 	"math/rand"
@@ -9,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/joho/godotenv"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -58,4 +60,22 @@ func Generate_Password() string {
 		b.WriteRune(chars[rand.Intn(len(chars))])
 	}
 	return b.String()
+}
+
+func ParseToken(tokenString string) (claims *models.Claims, err error) {
+	token, err := jwt.ParseWithClaims(tokenString, &models.Claims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("SECRET_KEY")), nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	claims, ok := token.Claims.(*models.Claims)
+
+	if !ok {
+		return nil, err
+	}
+
+	return claims, nil
 }
