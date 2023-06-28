@@ -29,9 +29,10 @@ func Send_Email(data [][3]string) {
 	port := "587"
 	address := host + ":" + port
 	auth := smtp.PlainAuth("", from, pass, host)
+	var msg []byte
 	var m []string
 	for i := 0; i < len(data); i++ {
-		msg := []byte("From: " + from + "\r\n" +
+		msg = []byte("From: " + from + "\r\n" +
 			"To: " + data[i][0] + "\r\n" + //
 			"Subject: Your access data\r\n\r\n" +
 			"Username: " + data[i][1] + "\n" + "Password: " + data[i][2] + "\r\n")
