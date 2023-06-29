@@ -41,7 +41,7 @@ func Create_Table(db *sqlx.DB) {
 	if err1 != nil {
 		panic(err1)
 	}
-	_, err2 := db.Exec(`CREATE TABLE IF NOT EXISTS "users_roles" (user_id bigint, role_id bigint)`)
+	_, err2 := db.Exec(`CREATE TABLE IF NOT EXISTS "users_roles" (user_id bigint references users_data (user_id) on delete cascade, role_id bigint)`)
 	if err2 != nil {
 		panic(err1)
 	}

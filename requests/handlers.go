@@ -18,4 +18,7 @@ func All_requests(route *gin.Engine, DB *sqlx.DB) {
 	route.POST("/login-form", handler_db.Sign_In)
 	route.POST("/registration-form", handler_db.Sign_Up)
 	route.POST("/logout-form", server.Logout)
+	route.POST("/add-manager", handler_db.AddManagerRole)
+	route.POST("/delete-manager", handler_db.DeleteManagerRole)
+	route.POST("/delete-user", handler_db.DeleteUser)
 }

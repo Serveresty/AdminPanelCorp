@@ -4,8 +4,6 @@ import (
 	"AdminPanelCorp/database"
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/utils"
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -170,18 +168,30 @@ func (db *DataBase) Admin_Panel(c *gin.Context) {
 
 	all_users_data, err := database.GetAllUsers(db.Data)
 
-	jsonUsersData, err := json.Marshal(all_users_data)
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("%s\n", jsonUsersData)
 	c.HTML(
 		http.StatusOK,
 		"panel.html",
 		gin.H{
 			"title": "Admin Panel",
-			"data":  jsonUsersData,
+			"data":  all_users_data,
 		},
 	)
+}
+
+func (db *DataBase) AddManagerRole(c *gin.Context) {
+	userId := c.PostForm("userId")
+	queryInsertUsersRole := `UPDATE users_roles SET role_id = (SELECT role_id FROM roles WHERE role_name = $1) where user_id = $2;`
+	db.Data.MustExec(queryInsertUsersRole, "manager", &userId)
+}
+
+func (db *DataBase) DeleteManagerRole(c *gin.Context) {
+	userId := c.PostForm("userId")
+	queryInsertUsersRole := `UPDATE users_roles SET role_id = (SELECT role_id FROM roles WHERE role_name = $1) where user_id = $2;`
+	db.Data.MustExec(queryInsertUsersRole, "user", &userId)
+}
+
+func (db *DataBase) DeleteUser(c *gin.Context) {
+	userId := c.PostForm("userId")
+	queryInsertUsersRole := `DELETE FROM users_data WHERE user_id=$1`
+	db.Data.MustExec(queryInsertUsersRole, &userId)
 }

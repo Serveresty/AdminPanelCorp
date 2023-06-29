@@ -16,15 +16,33 @@
             <th>Role</th>
             <th>Add manager role</th>
             <th>Delete manager role</th>
+            <th>Delete User</th>
         </tr>
+        {{ range .data}}
         <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td><button>click</button></td>
-            <td><button>click</button></td>
+            <td>{{.Id}}</td>
+            <td>{{.Email}}</td>
+            <td>{{.Username}}</td>
+            <td>{{.Password}}</td>
+            <td>{{.Role}}</td>
+            <td>
+                <form action="/add-manager" method="post">
+                    <input type="hidden" name="userId" value={{.Id}}>
+                    <button type="submit">add manager</button>
+                </form>
+            </td>
+            <td>
+                <form action="/delete-manager" method="post">
+                    <input type="hidden" name="userId" value={{.Id}}>
+                    <button>delete manager</button>
+                </form>
+            </td>
+            <td>
+                <form action="/delete-user" method="post">
+                    <input type="hidden" name="userId" value={{.Id}}>
+                    <button>delete user</button>
+                </form>
+            </td>
         </tr>
         {{ end }}
     </table>
