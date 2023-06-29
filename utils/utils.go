@@ -15,11 +15,13 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// Функция хэширования пароля
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14) //Хэширование пароля
 	return string(bytes), err
 }
 
+// Функция отправки данных пользователю на почту
 func Send_Email(data [][]string) {
 	err := godotenv.Load()
 	if err != nil {
@@ -49,6 +51,7 @@ func Send_Email(data [][]string) {
 	}
 }
 
+// Функция генерации пароля
 func Generate_Password() string {
 	rand.Seed(time.Now().UnixNano())
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
@@ -62,6 +65,7 @@ func Generate_Password() string {
 	return b.String()
 }
 
+// Считывание токена и занесение в структуру Claims
 func ParseToken(tokenString string) (claims *models.Claims, err error) {
 	token, err := jwt.ParseWithClaims(tokenString, &models.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(os.Getenv("SECRET_KEY")), nil

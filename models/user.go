@@ -1,5 +1,6 @@
 package models
 
+//Структура пользователя
 type User struct {
 	Id       int    `json:"id"`
 	Email    string `json:"email"`

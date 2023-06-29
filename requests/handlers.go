@@ -7,6 +7,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// Хэндлеры на запросы
 func All_requests(route *gin.Engine, DB *sqlx.DB) {
 	handler_db := server.DataBase{Data: DB}
 	route.LoadHTMLGlob("web/templates/*")

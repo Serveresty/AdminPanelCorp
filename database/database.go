@@ -9,16 +9,8 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Config struct {
-	Host     string
-	Port     string
-	Username string
-	Password string
-	DBName   string
-	SSLMode  string
-}
-
-func DB_Init(cfg Config) (*sqlx.DB, error) {
+// Функция инициализации БД
+func DB_Init(cfg *models.Config) (*sqlx.DB, error) {
 	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.Host, cfg.Port, cfg.Username, cfg.Password, cfg.DBName, cfg.SSLMode))
 	if err != nil {
@@ -32,21 +24,15 @@ func DB_Init(cfg Config) (*sqlx.DB, error) {
 	return db, nil
 }
 
-func Create_Table(db *sqlx.DB) {
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS "users_data" (user_id bigserial primary key, email varchar(255) unique, username varchar(255) unique, password varchar(255))`)
-	if err != nil {
-		panic(err)
-	}
-	_, err1 := db.Exec(`CREATE TABLE IF NOT EXISTS "roles" (role_id bigserial primary key, role_name varchar(255) unique)`)
-	if err1 != nil {
-		panic(err1)
-	}
-	_, err2 := db.Exec(`CREATE TABLE IF NOT EXISTS "users_roles" (user_id bigint references users_data (user_id) on delete cascade, role_id bigint)`)
-	if err2 != nil {
-		panic(err1)
-	}
+// Функция создания таблиц с пользователями, ролями и их соответствием
+func Create_Table(db *sqlx.DB) (error, error, error) {
+	_, err1 := db.Exec(`CREATE TABLE IF NOT EXISTS "users_data" (user_id bigserial primary key, email varchar(255) unique, username varchar(255) unique, password varchar(255))`)
+	_, err2 := db.Exec(`CREATE TABLE IF NOT EXISTS "roles" (role_id bigserial primary key, role_name varchar(255) unique)`)
+	_, err3 := db.Exec(`CREATE TABLE IF NOT EXISTS "users_roles" (user_id bigint references users_data (user_id) on delete cascade, role_id bigint)`)
+	return err1, err2, err3
 }
 
+// Функция проверки на существующего пользователя
 func IsUserRegistered(db *sqlx.DB, email string) bool {
 	var userID int
 	get_user_id := "select user_id from users_data where email = $1"
@@ -66,6 +52,7 @@ func IsUserRegistered(db *sqlx.DB, email string) bool {
 	return false
 }
 
+// Функция проверки соответствия введенного пароля и пароля в БД
 func CheckPassword(db *sqlx.DB, email string, password string) error {
 	var hash_pass string
 	getusers_hash_pass := "select password from users_data where email = $1"
@@ -89,6 +76,7 @@ func CheckPassword(db *sqlx.DB, email string, password string) error {
 	return nil
 }
 
+// Функция для админ панели на получение всех зарегистрированных пользователей
 func GetAllUsers(db *sqlx.DB) ([]models.User, error) {
 	var users_data []models.User
 	getuser := "select users_data.user_id, email, username, password, roles.role_name from users_data join users_roles on (users_roles.user_id=users_data.user_id) join roles on (roles.role_id=users_roles.role_id)"

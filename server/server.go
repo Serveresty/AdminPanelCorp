@@ -17,10 +17,12 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Структура с указателем на БД
 type DataBase struct {
 	Data *sqlx.DB
 }
 
+// Главная страница при GET запросе
 func (db *DataBase) Home_Page(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
@@ -45,6 +47,7 @@ func (db *DataBase) Home_Page(c *gin.Context) {
 	)
 }
 
+// Страница авторизации при GET запросе
 func (db *DataBase) Sign_In_Page(c *gin.Context) {
 	_, err := c.Cookie("token")
 
@@ -59,6 +62,7 @@ func (db *DataBase) Sign_In_Page(c *gin.Context) {
 	)
 }
 
+// Страница регистрации при GET запросе
 func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 	_, err := c.Cookie("token")
 
@@ -73,6 +77,7 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 	)
 }
 
+// Функция для POST запроса регистрации
 func (db *DataBase) Sign_Up(c *gin.Context) {
 	var id int
 	var slice []string
@@ -98,6 +103,7 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 	utils.Send_Email(data) //Отправка сообщения на почту с данными пользователя
 }
 
+// Функция для POST запроса авторизации
 func (db *DataBase) Sign_In(c *gin.Context) {
 	var user models.User
 	email := c.PostForm("email")
@@ -144,11 +150,13 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 	c.JSON(200, gin.H{"success": "user logged in"})
 }
 
+// Функция для POST запроса выхода из сессии
 func Logout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "localhost", false, true)
 	c.JSON(200, gin.H{"success": "user logged out"})
 }
 
+// Функция для GET запроса на Админ Панель
 func (db *DataBase) Admin_Panel(c *gin.Context) {
 	cookie, err := c.Cookie("token")
 	if err != nil {
@@ -180,6 +188,7 @@ func (db *DataBase) Admin_Panel(c *gin.Context) {
 	)
 }
 
+// Функция, получающая файл из <input>
 func (db *DataBase) UploadUsers(c *gin.Context) {
 	fileObj, err := c.FormFile("filename")
 	if err != nil {
@@ -214,6 +223,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 	}
 }
 
+// Функция, читающая CSV
 func ReadCSVFile(filePath string) [][]string {
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -230,18 +240,21 @@ func ReadCSVFile(filePath string) [][]string {
 	return records
 }
 
+// Функция добавления роли менеджера админом
 func (db *DataBase) AddManagerRole(c *gin.Context) {
 	userId := c.PostForm("userId")
 	queryInsertUsersRole := `UPDATE users_roles SET role_id = (SELECT role_id FROM roles WHERE role_name = $1) where user_id = $2;`
 	db.Data.MustExec(queryInsertUsersRole, "manager", &userId)
 }
 
+// Функция удаления роли менеджера админом
 func (db *DataBase) DeleteManagerRole(c *gin.Context) {
 	userId := c.PostForm("userId")
 	queryInsertUsersRole := `UPDATE users_roles SET role_id = (SELECT role_id FROM roles WHERE role_name = $1) where user_id = $2;`
 	db.Data.MustExec(queryInsertUsersRole, "user", &userId)
 }
 
+// Функция удаления пользователя админом
 func (db *DataBase) DeleteUser(c *gin.Context) {
 	userId := c.PostForm("userId")
 	queryInsertUsersRole := `DELETE FROM users_data WHERE user_id=$1`
