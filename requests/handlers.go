@@ -21,4 +21,5 @@ func All_requests(route *gin.Engine, DB *sqlx.DB) {
 	route.POST("/add-manager", handler_db.AddManagerRole)
 	route.POST("/delete-manager", handler_db.DeleteManagerRole)
 	route.POST("/delete-user", handler_db.DeleteUser)
+	route.POST("/upload", handler_db.UploadUsers)
 }
