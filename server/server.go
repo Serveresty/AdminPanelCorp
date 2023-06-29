@@ -208,6 +208,10 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 		records[i] = append(records[i], password)
 	}
 	utils.Send_Email(records)
+	eerr := os.Remove(filePath)
+	if eerr != nil {
+		log.Fatal(eerr)
+	}
 }
 
 func ReadCSVFile(filePath string) [][]string {
