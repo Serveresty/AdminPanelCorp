@@ -188,7 +188,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 		})
 		return
 	}
-	filePath := fmt.Sprintf("./csv/%s", fileObj.Filename)
+	filePath := fmt.Sprintf("./%s", fileObj.Filename)
 	c.SaveUploadedFile(fileObj, filePath)
 
 	records := ReadCSVFile(filePath)
