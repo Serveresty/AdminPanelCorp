@@ -1,6 +1,7 @@
 package server
 
 import (
+	"AdminPanelCorp/database"
 	"AdminPanelCorp/utils"
 	"encoding/csv"
 	"fmt"
@@ -13,34 +14,20 @@ import (
 
 // Функция, получающая файл из <input>
 func (db *DataBase) UploadUsers(c *gin.Context) {
-	fileObj, err := c.FormFile("filename")
+	fileObj, err := c.FormFile("filename") //Получение csv файла из html
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"err": err,
 		})
 		return
 	}
-	filePath := fmt.Sprintf("./%s", fileObj.Filename)
-	c.SaveUploadedFile(fileObj, filePath)
+	filePath := fmt.Sprintf("./%s", fileObj.Filename) //Задавание пути csv файла
+	c.SaveUploadedFile(fileObj, filePath)             //Сохранение csv файла
 
-	records := ReadCSVFile(filePath)
-
-	var id int
-
-	queryInsertNewUser := `INSERT INTO "users_data" (email, username, password) VALUES($1, $2, $3)`
-	getuser := "select user_id from users_data where username = $1"
-	queryInsertUsersRole := `INSERT INTO "users_roles" (user_id, role_id) VALUES($1, $2)`
-
-	for i, element := range records {
-		password := utils.Generate_Password()                                       //Генерация пароля
-		hash_password, _ := utils.HashPassword(password)                            //Хэш пароля
-		db.Data.MustExec(queryInsertNewUser, element[0], element[1], hash_password) //Добавление в базу нового пользователя
-		db.Data.Get(&id, getuser, element[1])                                       //Получить id пользователя по username
-		db.Data.MustExec(queryInsertUsersRole, &id, 1)                              //Присвоение роли user по id пользователя
-		records[i] = append(records[i], password)
-	}
-	utils.Send_Email(records)
-	eerr := os.Remove(filePath)
+	records := ReadCSVFile(filePath)               //Считывание csv файла
+	data := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
+	utils.Send_Email(data)                         //Отправление готовых данных в отправку сообщений на почты
+	eerr := os.Remove(filePath)                    //Удаление csv файла из Path
 	if eerr != nil {
 		log.Fatal(eerr)
 	}
@@ -48,17 +35,17 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 
 // Функция, читающая CSV
 func ReadCSVFile(filePath string) [][]string {
-	f, err := os.Open(filePath)
+	f, err := os.Open(filePath) //Открытие csv файла
 	if err != nil {
 		log.Fatal("Unable to read input file "+filePath, err)
 	}
 	defer f.Close()
 
 	csvReader := csv.NewReader(f)
-	records, err := csvReader.ReadAll()
+	records, err := csvReader.ReadAll() //Считывание csv файла
 	if err != nil {
 		log.Fatal("Unable to parse file as CSV for "+filePath, err)
 	}
 
-	return records
+	return records //Возврат массива из структур с данными пользователей
 }

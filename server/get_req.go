@@ -9,7 +9,7 @@ import (
 
 // Главная страница при GET запросе
 func (db *DataBase) Home_Page(c *gin.Context) {
-	cookie, err := c.Cookie("token")
+	cookie, err := c.Cookie("token") //Проверка на существование куки
 	if err != nil {
 		c.JSON(401, gin.H{"error": "unauthorized"})
 		return
@@ -34,7 +34,7 @@ func (db *DataBase) Home_Page(c *gin.Context) {
 
 // Страница авторизации при GET запросе
 func (db *DataBase) Sign_In_Page(c *gin.Context) {
-	_, err := c.Cookie("token")
+	_, err := c.Cookie("token") //Проверка на существование куки
 
 	if err == nil {
 		c.JSON(401, gin.H{"error": "already authorized"})
@@ -49,7 +49,7 @@ func (db *DataBase) Sign_In_Page(c *gin.Context) {
 
 // Страница регистрации при GET запросе
 func (db *DataBase) Sign_Up_Page(c *gin.Context) {
-	_, err := c.Cookie("token")
+	_, err := c.Cookie("token") //Проверка на существование куки
 
 	if err == nil {
 		c.JSON(401, gin.H{"error": "already authorized"})
@@ -64,7 +64,7 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 
 // Функция для GET запроса на Админ Панель
 func (db *DataBase) Admin_Panel(c *gin.Context) {
-	cookie, err := c.Cookie("token")
+	cookie, err := c.Cookie("token") //Проверка на существование куки
 	if err != nil {
 		c.JSON(401, gin.H{"error": "unauthorized"})
 		return
