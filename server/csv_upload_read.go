@@ -31,6 +31,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 	if eerr != nil {
 		log.Fatal(eerr)
 	}
+	c.Redirect(http.StatusFound, "/admin")
 }
 
 // Функция, читающая CSV

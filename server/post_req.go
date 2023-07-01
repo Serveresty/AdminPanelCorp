@@ -29,7 +29,6 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 	data := database.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
 
 	utils.Send_Email(data) //Отправка сообщения на почту с данными пользователя
-	c.Redirect(http.StatusFound, "/sign-in")
 }
 
 // Функция для POST запроса авторизации
