@@ -39,10 +39,12 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 	//Проверка на существование пользователя
 	if !utils.IsUserRegistered(db.Data, email) {
 		c.JSON(401, gin.H{"error": "user doesn't registered"})
+		return
 	}
 	//Проверка на соответствие паролей в БД с введенным пользователем
 	if err := utils.CheckPassword(db.Data, email, password); err != nil {
 		c.JSON(401, gin.H{"error": "wrong password"})
+		return
 	}
 	getuser := "select users_data.user_id, email, username, roles.role_name from users_data join users_roles on (users_roles.user_id=users_data.user_id) join roles on (roles.role_id=users_roles.role_id) where users_data.email=$1"
 	row, err := db.Data.Query(getuser, email)
