@@ -4,7 +4,6 @@ import (
 	"AdminPanelCorp/database"
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/utils"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -39,11 +38,11 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 
 	//Проверка на существование пользователя
 	if !utils.IsUserRegistered(db.Data, email) {
-		log.Fatal("user doesn't registered")
+		c.JSON(401, gin.H{"error": "user doesn't registered"})
 	}
 	//Проверка на соответствие паролей в БД с введенным пользователем
 	if err := utils.CheckPassword(db.Data, email, password); err != nil {
-		log.Fatal("wrong password")
+		c.JSON(401, gin.H{"error": "wrong password"})
 	}
 	getuser := "select users_data.user_id, email, username, roles.role_name from users_data join users_roles on (users_roles.user_id=users_data.user_id) join roles on (roles.role_id=users_roles.role_id) where users_data.email=$1"
 	row, err := db.Data.Query(getuser, email)
