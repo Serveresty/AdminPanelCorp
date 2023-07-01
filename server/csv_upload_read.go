@@ -31,7 +31,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 	if eerr != nil {
 		log.Fatal(eerr)
 	}
-	c.Redirect(http.StatusFound, "/admin")
+	c.JSON(http.StatusOK, gin.H{"success": "all users has been added"})
 }
 
 // Функция, читающая CSV

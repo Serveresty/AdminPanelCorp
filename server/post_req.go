@@ -28,6 +28,8 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 	data := database.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
 
 	utils.Send_Email(data) //Отправка сообщения на почту с данными пользователя
+
+	c.JSON(200, gin.H{"success": "user registered"})
 }
 
 // Функция для POST запроса авторизации
@@ -62,9 +64,7 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 
 	//Клейм для JWT token
 	claims := &models.Claims{
-		Id:       user.Id,
-		Username: user.Username,
-		Role:     user.Role,
+		Role: user.Role,
 		StandardClaims: jwt.StandardClaims{
 			Subject:   user.Email,
 			ExpiresAt: expirationTime.Unix(),
@@ -84,8 +84,7 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 	//Создание куки
 	c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", "localhost", false, true)
 
-	//c.JSON(200, gin.H{"success": "user logged in"})
-	c.Redirect(http.StatusFound, "/")
+	c.JSON(200, gin.H{"success": "user logged in"})
 }
 
 // Функция для POST запроса выхода из сессии

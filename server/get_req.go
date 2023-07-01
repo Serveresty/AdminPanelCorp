@@ -11,14 +11,14 @@ import (
 func (db *DataBase) Home_Page(c *gin.Context) {
 	cookie, err := c.Cookie("token") //Проверка на существование куки
 	if err != nil {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+		c.JSON(401, gin.H{"error": "unauthorizedH1"})
 		return
 	}
 
 	claims, err := utils.ParseToken(cookie)
 
 	if err != nil {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+		c.JSON(401, gin.H{"error": "unauthorizedH2"})
 		return
 	}
 	if claims.Role != "" {
@@ -64,16 +64,16 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 
 // Функция для GET запроса на Админ Панель
 func (db *DataBase) Admin_Panel(c *gin.Context) {
-	cookie, err := c.Cookie("token") //Проверка на существование куки
-	if err != nil {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+	cookie, err1 := c.Cookie("token") //Проверка на существование куки
+	if err1 != nil {
+		c.JSON(401, gin.H{"error": "unauthorized1"})
 		return
 	}
 
-	claims, err := utils.ParseToken(cookie)
+	claims, err2 := utils.ParseToken(cookie)
 
-	if err != nil {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+	if err2 != nil {
+		c.JSON(401, gin.H{"error": "unauthorized2"})
 		return
 	}
 
@@ -82,7 +82,11 @@ func (db *DataBase) Admin_Panel(c *gin.Context) {
 		return
 	}
 
-	all_users_data, err := utils.GetAllUsers(db.Data)
+	all_users_data, err3 := utils.GetAllUsers(db.Data)
+
+	if err3 != nil {
+		c.JSON(401, gin.H{"error": "error with parsing users from"})
+	}
 
 	c.HTML(
 		http.StatusOK,
