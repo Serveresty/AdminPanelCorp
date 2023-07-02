@@ -11,18 +11,19 @@ import (
 func (db *DataBase) Home_Page(c *gin.Context) {
 	cookie, err := c.Cookie("token") //Проверка на существование куки
 	if err != nil {
-		c.JSON(401, gin.H{"error": "unauthorizedH1"})
+		c.JSON(401, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	claims, err := utils.ParseToken(cookie)
 
 	if err != nil {
-		c.JSON(401, gin.H{"error": "unauthorizedH2"})
+		c.JSON(401, gin.H{"error": "unauthorized"})
 		return
 	}
-	if claims.Role != "" {
 
+	if len(claims.StandardClaims.Subject) == 0 {
+		c.JSON(401, gin.H{"error": "unauthorized"})
 	}
 
 	c.HTML(
@@ -64,21 +65,28 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 
 // Функция для GET запроса на Админ Панель
 func (db *DataBase) Admin_Panel(c *gin.Context) {
+	var access bool = false
 	cookie, err1 := c.Cookie("token") //Проверка на существование куки
 	if err1 != nil {
-		c.JSON(401, gin.H{"error": "unauthorized1"})
+		c.JSON(401, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	claims, err2 := utils.ParseToken(cookie)
 
 	if err2 != nil {
-		c.JSON(401, gin.H{"error": "unauthorized2"})
+		c.JSON(401, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	if claims.Role != "admin" && claims.Role != "manager" {
-		c.JSON(401, gin.H{"error": "no permissions to access this page"})
+	//fmt.Println(claims.Role)
+	for _, k := range claims.Role {
+		if k == "admin" || k == "manager" {
+			access = true
+		}
+	}
+	if !access {
+		c.JSON(401, gin.H{"error": "No rights to access this page"})
 		return
 	}
 

@@ -5,6 +5,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ .title }}</title>
+
+    <style type="text/css">
+        TABLE {
+         border-collapse: collapse;  
+         border: 2px solid red; 
+        }
+        TD, TH {
+         padding: 5px; 
+         border: 2px solid red;
+        }
+    </style>
 </head>
 <body>
     <div>
@@ -45,7 +56,7 @@
             <td>{{.Email}}</td>
             <td>{{.Username}}</td>
             <td>{{.Password}}</td>
-            <td>{{.Role}}</td>
+            <td>{{ range .Role}} {{ . }} <br> {{ end }}</td>
             <td>
                 <form action="/add-manager" method="post">
                     <input type="hidden" name="userId" value={{.Id}}>

@@ -10,16 +10,16 @@ import (
 // Функция добавления роли менеджера админом
 func (db *DataBase) AddManagerRole(c *gin.Context) {
 	userId := c.PostForm("userId")
-	queryInsertUsersRole := `UPDATE users_roles SET role_id = (SELECT role_id FROM roles WHERE role_name = $1) where user_id = $2;`
-	db.Data.MustExec(queryInsertUsersRole, "manager", &userId)
+	queryInsertUsersRole := `INSERT INTO users_roles (user_id, role_id) SELECT users_data.user_id, roles.role_id FROM users_data, roles WHERE users_data.user_id=$1 and roles.role_name=$2;`
+	db.Data.MustExec(queryInsertUsersRole, &userId, "manager")
 	c.Redirect(http.StatusFound, "/admin")
 }
 
 // Функция удаления роли менеджера админом
 func (db *DataBase) DeleteManagerRole(c *gin.Context) {
 	userId := c.PostForm("userId")
-	queryInsertUsersRole := `UPDATE users_roles SET role_id = (SELECT role_id FROM roles WHERE role_name = $1) where user_id = $2;`
-	db.Data.MustExec(queryInsertUsersRole, "user", &userId)
+	queryInsertUsersRole := `DELETE FROM users_roles WHERE user_id=$1 and role_id=(SELECT role_id FROM roles WHERE role_name = $2)`
+	db.Data.MustExec(queryInsertUsersRole, &userId, "manager")
 	c.Redirect(http.StatusFound, "/admin")
 }
 
