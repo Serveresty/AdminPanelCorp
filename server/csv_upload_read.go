@@ -24,12 +24,12 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 	filePath := fmt.Sprintf("./%s", fileObj.Filename)   //Задание пути файла
 	err_saving := c.SaveUploadedFile(fileObj, filePath) //Сохранение файла
 	if err_saving != nil {
-		c.JSON(400, gin.H{"error": "Error while saving file"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error while saving file"})
 	}
 
 	records, err := readCSVFile(filePath) //Считывание файла
 	if err != nil {
-		c.JSON(400, gin.H{"error": "Error while reading file"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 	}
 
 	data := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
@@ -37,7 +37,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 
 	eerr := os.Remove(filePath) //Удаление csv файла из Path
 	if eerr != nil {
-		c.JSON(400, gin.H{"error": "Error while deleting file"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error while deleting file"})
 	}
 	c.JSON(http.StatusOK, gin.H{"success": "all users has been added"})
 }
