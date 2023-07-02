@@ -2,7 +2,6 @@ package utils
 
 import (
 	"AdminPanelCorp/models"
-	"fmt"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -27,14 +26,12 @@ func GetAllUsers(db *sqlx.DB) ([]models.User, error) {
 		getuser_roles := "select roles.role_name from users_data join users_roles on (users_roles.user_id=users_data.user_id) join roles on (roles.role_id=users_roles.role_id) where users_data.email=$1;"
 		roww, err := db.Query(getuser_roles, current_user.Email)
 		if err != nil {
-			fmt.Println("firsttt")
-			fmt.Println(err)
+			return nil, err
 		}
 		defer roww.Close()
 		for roww.Next() {
 			if err := roww.Scan(&role); err != nil {
-				fmt.Println("seconddd")
-				fmt.Println(err)
+				return nil, err
 			}
 			current_user.Role = append(current_user.Role, role)
 		}

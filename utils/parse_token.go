@@ -3,7 +3,6 @@ package utils
 import (
 	"AdminPanelCorp/env"
 	"AdminPanelCorp/models"
-	"fmt"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -16,16 +15,12 @@ func ParseToken(tokenString string) (claims *models.Claims, err error) {
 	})
 
 	if err != nil {
-		fmt.Println("first")
-		fmt.Println(err)
 		return nil, err
 	}
 
 	claims, ok := token.Claims.(*models.Claims)
 
 	if !ok {
-		fmt.Println("second")
-		fmt.Println(err)
 		return nil, err
 	}
 

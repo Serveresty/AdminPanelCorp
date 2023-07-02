@@ -11,19 +11,19 @@ import (
 func (db *DataBase) Home_Page(c *gin.Context) {
 	cookie, err := c.Cookie("token") //Проверка на существование куки
 	if err != nil {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	claims, err := utils.ParseToken(cookie)
 
 	if err != nil {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	if len(claims.StandardClaims.Subject) == 0 {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 	}
 
 	c.HTML(
@@ -38,7 +38,7 @@ func (db *DataBase) Sign_In_Page(c *gin.Context) {
 	_, err := c.Cookie("token") //Проверка на существование куки
 
 	if err == nil {
-		c.JSON(401, gin.H{"error": "already authorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "already authorized"})
 		return
 	}
 	c.HTML(
@@ -53,7 +53,7 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 	_, err := c.Cookie("token") //Проверка на существование куки
 
 	if err == nil {
-		c.JSON(401, gin.H{"error": "already authorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "already authorized"})
 		return
 	}
 	c.HTML(
@@ -68,14 +68,14 @@ func (db *DataBase) Admin_Panel(c *gin.Context) {
 	var access bool = false
 	cookie, err1 := c.Cookie("token") //Проверка на существование куки
 	if err1 != nil {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	claims, err2 := utils.ParseToken(cookie)
 
 	if err2 != nil {
-		c.JSON(401, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
@@ -86,14 +86,14 @@ func (db *DataBase) Admin_Panel(c *gin.Context) {
 		}
 	}
 	if !access {
-		c.JSON(401, gin.H{"error": "No rights to access this page"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to access this page"})
 		return
 	}
 
 	all_users_data, err3 := utils.GetAllUsers(db.Data)
 
 	if err3 != nil {
-		c.JSON(401, gin.H{"error": "error with parsing users from"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error while parsing users from db"})
 	}
 
 	c.HTML(
