@@ -2,6 +2,7 @@ package main
 
 import (
 	"AdminPanelCorp/database"
+	"AdminPanelCorp/env"
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/requests"
 	"log"
@@ -20,12 +21,12 @@ func init() {
 func main() {
 	//Подключаемся к БД(через структуру Config передаем данные для подключения)
 	db, err := database.DB_Init(&models.Config{
-		Host:     "localhost",
-		Port:     "5432",
-		Username: "postgres",
-		Password: "abegah54",
-		DBName:   "postgres",
-		SSLMode:  "disable",
+		Host:     env.GetEnv("Host"),
+		Port:     env.GetEnv("Port"),
+		Username: env.GetEnv("Username"),
+		Password: env.GetEnv("Password"),
+		DBName:   env.GetEnv("DBName"),
+		SSLMode:  env.GetEnv("SSLMode"),
 	})
 
 	defer db.Close()

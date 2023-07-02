@@ -2,11 +2,11 @@ package server
 
 import (
 	"AdminPanelCorp/database"
+	"AdminPanelCorp/env"
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/utils"
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -100,7 +100,7 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	//Кодирование токена по ключу
-	tokenString, err := token.SignedString([]byte(os.Getenv("SECRET_KEY")))
+	tokenString, err := token.SignedString([]byte(env.GetEnv("SECRET_KEY")))
 	if err != nil {
 		c.JSON(500, gin.H{"error": "could not generate token"})
 		return

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"AdminPanelCorp/env"
 	"fmt"
 	"net/smtp"
 	"os"
@@ -8,8 +9,8 @@ import (
 
 // Функция отправки данных пользователю на почту
 func Send_Email(data [][]string) {
-	from := os.Getenv("MAIL")
-	pass := os.Getenv("MAIL_PASSWORD")
+	from := env.GetEnv("MAIL")
+	pass := env.GetEnv("MAIL_PASSWORD")
 	host := "smtp.gmail.com"
 	port := "587"
 	address := host + ":" + port

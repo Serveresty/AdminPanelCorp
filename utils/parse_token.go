@@ -1,16 +1,16 @@
 package utils
 
 import (
+	"AdminPanelCorp/env"
 	"AdminPanelCorp/models"
 	"fmt"
-	"os"
 
 	"github.com/dgrijalva/jwt-go"
 )
 
 // Считывание токена
 func ParseToken(tokenString string) (claims *models.Claims, err error) {
-	my_key := []byte(os.Getenv("SECRET_KEY"))
+	my_key := []byte(env.GetEnv("SECRET_KEY"))
 	token, err := jwt.ParseWithClaims(tokenString, &models.Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return my_key, err
 	})
