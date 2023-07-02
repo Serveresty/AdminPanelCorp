@@ -2,19 +2,12 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"net/smtp"
 	"os"
-
-	"github.com/joho/godotenv"
 )
 
 // Функция отправки данных пользователю на почту
 func Send_Email(data [][]string) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 	from := os.Getenv("MAIL")
 	pass := os.Getenv("MAIL_PASSWORD")
 	host := "smtp.gmail.com"
