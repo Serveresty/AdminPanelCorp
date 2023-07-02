@@ -36,36 +36,39 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 func (db *DataBase) Sign_In(c *gin.Context) {
 	var user models.User
 	var role string
-	email := c.PostForm("email")       //Получение из формы email'а
-	password := c.PostForm("password") //Получение из формы password'а
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	//Проверка на существование пользователя
-	if !utils.IsUserRegistered(db.Data, email) {
+	if !utils.IsUserRegistered(db.Data, user.Email) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user doesn't registered"})
 		return
 	}
 	//Проверка на соответствие паролей в БД с введенным пользователем
-	if err := utils.CheckPassword(db.Data, email, password); err != nil {
+	if err := utils.CheckPassword(db.Data, user.Email, user.Password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong password"})
 		return
 	}
 
-	getuser := "select user_id, email, username from users_data where users_data.email=$1"
-	row, err := db.Data.Query(getuser, email)
+	getuser := "select user_id, username from users_data where users_data.email=$1"
+	row, err := db.Data.Query(getuser, user.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 	defer row.Close()
 	for row.Next() {
-		if err := row.Scan(&user.Id, &user.Email, &user.Username); err != nil {
+		if err := row.Scan(&user.Id, &user.Username); err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 			return
 		}
 	}
 
 	getuser_roles := "select roles.role_name from users_data join users_roles on (users_roles.user_id=users_data.user_id) join roles on (roles.role_id=users_roles.role_id) where users_data.email=$1;"
-	roww, err := db.Data.Query(getuser_roles, email)
+	roww, err := db.Data.Query(getuser_roles, user.Email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
@@ -110,6 +113,6 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 // Функция для POST запроса выхода из сессии
 func Logout(c *gin.Context) {
 	c.SetCookie("token", "", -1, "/", "localhost", false, true) //Удаление куки
-	//c.JSON(200, gin.H{"success": "user logged out"})
+	c.JSON(http.StatusOK, gin.H{"success": "user logged out"})
 	c.Redirect(http.StatusFound, "/sign-in")
 }

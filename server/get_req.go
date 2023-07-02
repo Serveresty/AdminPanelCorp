@@ -26,11 +26,7 @@ func (db *DataBase) Home_Page(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 	}
 
-	c.HTML(
-		http.StatusOK,
-		"home_page.html",
-		gin.H{},
-	)
+	c.JSON(http.StatusAccepted, gin.H{"message": "access granted"})
 }
 
 // Страница авторизации при GET запросе
@@ -41,11 +37,7 @@ func (db *DataBase) Sign_In_Page(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "already authorized"})
 		return
 	}
-	c.HTML(
-		http.StatusOK,
-		"sign_in.html",
-		gin.H{},
-	)
+	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
 }
 
 // Страница регистрации при GET запросе
@@ -56,11 +48,7 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "already authorized"})
 		return
 	}
-	c.HTML(
-		http.StatusOK,
-		"sign_up.html",
-		gin.H{},
-	)
+	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
 }
 
 // Функция для GET запроса на Админ Панель
@@ -90,18 +78,13 @@ func (db *DataBase) Admin_Panel(c *gin.Context) {
 		return
 	}
 
+	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
+
 	all_users_data, err3 := utils.GetAllUsers(db.Data)
 
 	if err3 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error while parsing users from db"})
 	}
 
-	c.HTML(
-		http.StatusOK,
-		"panel.html",
-		gin.H{
-			"title": "Admin Panel",
-			"data":  all_users_data,
-		},
-	)
+	c.JSON(http.StatusOK, all_users_data)
 }
