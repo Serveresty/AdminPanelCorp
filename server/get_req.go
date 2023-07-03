@@ -3,19 +3,20 @@ package server
 import (
 	"AdminPanelCorp/utils"
 	"net/http"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Главная страница при GET запросе
 func (db *DataBase) Home_Page(c *gin.Context) {
-	cookie, err := c.Cookie("token") //Проверка на существование куки
-	if err != nil {
+	token := c.GetHeader("Authorization")
+	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	claims, err := utils.ParseToken(cookie)
+	claims, err := utils.ParseToken(token)
 
 	if err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -31,9 +32,9 @@ func (db *DataBase) Home_Page(c *gin.Context) {
 
 // Страница авторизации при GET запросе
 func (db *DataBase) Sign_In_Page(c *gin.Context) {
-	_, err := c.Cookie("token") //Проверка на существование куки
+	token := c.GetHeader("Authorization")
 
-	if err == nil {
+	if token != "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "already authorized"})
 		return
 	}
@@ -42,9 +43,9 @@ func (db *DataBase) Sign_In_Page(c *gin.Context) {
 
 // Страница регистрации при GET запросе
 func (db *DataBase) Sign_Up_Page(c *gin.Context) {
-	_, err := c.Cookie("token") //Проверка на существование куки
+	token := c.GetHeader("Authorization")
 
-	if err == nil {
+	if token != "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "already authorized"})
 		return
 	}
@@ -54,20 +55,21 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 // Функция для GET запроса на Админ Панель
 func (db *DataBase) Admin_Panel(c *gin.Context) {
 	var access bool = false
-	cookie, err1 := c.Cookie("token") //Проверка на существование куки
-	if err1 != nil {
+
+	token := c.GetHeader("Authorization")
+	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
+	token_string := strings.Split(token, " ")[1]
 
-	claims, err2 := utils.ParseToken(cookie)
+	claims, err2 := utils.ParseToken(token_string)
 
 	if err2 != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	//fmt.Println(claims.Role)
 	for _, k := range claims.Role {
 		if k == "admin" || k == "manager" {
 			access = true

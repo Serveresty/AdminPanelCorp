@@ -10,8 +10,6 @@ import (
 // Хэндлеры на запросы
 func All_requests(route *gin.Engine, DB *sqlx.DB) {
 	handler_db := server.DataBase{Data: DB}
-	route.LoadHTMLGlob("web/templates/*")
-	route.Static("/web", "./web/")
 	route.GET("/", handler_db.Home_Page)
 	route.GET("/sign-up", handler_db.Sign_Up_Page)
 	route.GET("/sign-in", handler_db.Sign_In_Page)

@@ -123,15 +123,18 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 		return
 	}
 
+	bearer := "Bearer " + tokenString
+	c.Header("Authorization", bearer)
+
 	//Создание куки
-	c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", "localhost", false, true)
+	//c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", "localhost", false, true)
 
 	c.JSON(http.StatusOK, gin.H{"success": "user logged in"})
 }
 
 // Функция для POST запроса выхода из сессии
 func Logout(c *gin.Context) {
-	c.SetCookie("token", "", -1, "/", "localhost", false, true) //Удаление куки
+	c.Header("Authorization", "")
 	c.JSON(http.StatusOK, gin.H{"success": "user logged out"})
 	c.Redirect(http.StatusFound, "/sign-in")
 }
