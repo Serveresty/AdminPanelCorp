@@ -31,9 +31,15 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 		records = append(records, []string{elem.Email, elem.Username})
 	}
 
-	data := database.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
+	data, email_error := database.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
+	if email_error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
+	}
 
-	utils.Send_Email(data) //Отправка сообщения на почту с данными пользователя
+	err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
+	if err_mail != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+	}
 
 	if len(err_users) > 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": err_users})

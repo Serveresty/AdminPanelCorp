@@ -4,9 +4,8 @@ import (
 	"AdminPanelCorp/database"
 	"AdminPanelCorp/utils"
 	"bufio"
-	"fmt"
+	"mime/multipart"
 	"net/http"
-	"os"
 	"regexp"
 
 	"github.com/gin-gonic/gin"
@@ -14,53 +13,56 @@ import (
 
 // Функция, получающая файл из <input>
 func (db *DataBase) UploadUsers(c *gin.Context) {
-	fileObj, err := c.FormFile("filename") //Получение файла из html
+	file, handler, err := c.Request.FormFile("user_registration")
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"err": err,
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-	filePath := fmt.Sprintf("./%s", fileObj.Filename)   //Задание пути файла
-	err_saving := c.SaveUploadedFile(fileObj, filePath) //Сохранение файла
-	if err_saving != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Error while saving file"})
+	defer file.Close()
+	res, err2 := handler.Open()
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err2})
+		return
 	}
-
-	records, err := readCSVFile(filePath) //Считывание файла
-	if err != nil {
+	result, err3 := readCSVFile(res)
+	if err3 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 	}
 
-	data := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
-	utils.Send_Email(data)                         //Отправление готовых данных в отправку сообщений на почты
-
-	eerr := os.Remove(filePath) //Удаление csv файла из Path
-	if eerr != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Error while deleting file"})
+	data, email_error := database.CreateUsers(db.Data, result) //Отправление данных вида (email, username) в функцию создания пользователей
+	if email_error != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 	}
-	c.JSON(http.StatusOK, gin.H{"success": "all users has been added"})
+	err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
+	if err_mail != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "Operation has been completed"})
 }
 
 // Функция, читающая файл с email и username
-func readCSVFile(filePath string) ([][]string, error) {
+func readCSVFile(fl multipart.File) ([][]string, error) {
 	var line []string
 	var records [][]string
-	file, err := os.Open(filePath) //Открытие файла
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
 
-	fileScanner := bufio.NewScanner(file)
+	fileScanner := bufio.NewScanner(fl)
 
 	//Сканирование файла построчно
 	for fileScanner.Scan() {
-		words := regexp.MustCompile("[,;\n]{1}").Split(fileScanner.Text(), -1)
+		words := regexp.MustCompile("[,;\n ]{1}").Split(fileScanner.Text(), -1)
 		for _, word := range words {
+			if word == "" {
+				continue
+			}
 			line = append(line, word)
 		}
-		records = append(records, line)
+		if line == nil {
+			continue
+		}
+		if len(line) > 1 && len(line) < 3 {
+			records = append(records, line)
+		}
 		line = nil
 	}
 

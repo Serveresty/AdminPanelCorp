@@ -2,13 +2,12 @@ package utils
 
 import (
 	"AdminPanelCorp/env"
-	"fmt"
 	"net/smtp"
-	"os"
 )
 
 // Функция отправки данных пользователю на почту
-func Send_Email(data [][]string) {
+func Send_Email(data [][]string) [][]string {
+	var email_errors [][]string
 	from := env.GetEnv("MAIL")
 	pass := env.GetEnv("MAIL_PASSWORD")
 	host := "smtp.gmail.com"
@@ -26,9 +25,9 @@ func Send_Email(data [][]string) {
 		m = append(m, data[i][0])
 		err := smtp.SendMail(address, auth, from, m, msg)
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			email_errors = append(email_errors, []string{data[i][0], "not valid email"})
 		}
 		m = nil
 	}
+	return email_errors
 }
