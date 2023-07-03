@@ -162,7 +162,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"user_id\": 22,\r\n    \"role\": \"manager\"\r\n}",
+							"raw": "{\r\n    \"user_id\": 68,\r\n    \"role\": \"manager\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
