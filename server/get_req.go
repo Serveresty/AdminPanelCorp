@@ -35,7 +35,7 @@ func (db *DataBase) Sign_In_Page(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 
 	if token != "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "already authorized"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "already authorized"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
@@ -46,7 +46,7 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 
 	if token != "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "already authorized"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "already authorized"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
@@ -58,7 +58,7 @@ func (db *DataBase) Admin_Panel(c *gin.Context) {
 
 	token := c.GetHeader("Authorization")
 	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
 	token_string := strings.Split(token, " ")[1]
@@ -66,7 +66,7 @@ func (db *DataBase) Admin_Panel(c *gin.Context) {
 	claims, err2 := utils.ParseToken(token_string)
 
 	if err2 != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
 
