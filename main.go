@@ -49,7 +49,7 @@ func main() {
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
-	requests.All_requests(router, db)
+	requests.All_Requests(router, db)
 
 	router.Run(":8080")
 }
