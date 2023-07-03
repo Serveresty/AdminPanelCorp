@@ -14,22 +14,35 @@ import (
 
 // Функция для POST запроса регистрации
 func (db *DataBase) Sign_Up(c *gin.Context) {
-	var slice []string
+	var user []models.User
 	var records [][]string
-	emails := c.PostFormArray("email")
-	usernames := c.PostFormArray("username")
+	var err_users []models.User
 
-	for i, r := range emails {
-		slice = append(slice, r, usernames[i]) //Объединение почты, username и пароля в слайс
-		records = append(records, slice)       //Добавление слайса в слайс для передачи в функцию отправки письма на почту
-		slice = nil
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	for _, elem := range user {
+		//Проверка на существование пользователя
+		if utils.IsUserRegistered(db.Data, elem.Email, elem.Username) {
+			err_users = append(err_users, elem)
+			continue
+		}
+		records = append(records, []string{elem.Email, elem.Username})
 	}
 
 	data := database.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
 
 	utils.Send_Email(data) //Отправка сообщения на почту с данными пользователя
 
-	c.JSON(http.StatusOK, gin.H{"success": "user has been registered"})
+	if len(err_users) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": err_users})
+	}
+
+	if len(records) > 0 {
+		c.JSON(http.StatusOK, gin.H{"success": "user has been registered"})
+	}
+
 }
 
 // Функция для POST запроса авторизации
@@ -43,7 +56,7 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 	}
 
 	//Проверка на существование пользователя
-	if !utils.IsUserRegistered(db.Data, user.Email) {
+	if !utils.IsUserRegistered(db.Data, user.Email, user.Username) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user doesn't registered"})
 		return
 	}

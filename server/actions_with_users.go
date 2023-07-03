@@ -39,7 +39,7 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	queryInsertUsersRole := `DELETE FROM users_data WHERE user_id=$1 or email=$2 or username=$3`
-	db.Data.MustExec(queryInsertUsersRole, &user.Id, &user.Email, &user.Username)
+	queryInsertUsersRole := `DELETE FROM users_data WHERE user_id=$1`
+	db.Data.MustExec(queryInsertUsersRole, &user.Id)
 	c.Redirect(http.StatusFound, "/admin")
 }
