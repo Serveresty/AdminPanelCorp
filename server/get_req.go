@@ -54,7 +54,7 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 
 // Функция для GET запроса на Админ Панель
 func (db *DataBase) Admin_Panel(c *gin.Context) {
-	var access bool = false
+	var access bool
 
 	token := c.GetHeader("Authorization")
 	if token == "" {

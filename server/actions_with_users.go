@@ -16,34 +16,64 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") != "" {
-		if utils.IsEmailValid(user.Email) {
-			queryInsertNewUsersData := `UPDATE users_data SET email = $2, username = $3 WHERE user_id=$1`
-			db.Data.MustExec(queryInsertNewUsersData, &user.Id, &user.Email, &user.Username)
-			c.JSON(http.StatusOK, gin.H{"success": "Username and Email has been changed"})
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
-		}
+
+	token := c.GetHeader("Authorization")
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
-	if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") == "" {
-		if utils.IsEmailValid(user.Email) {
-			queryInsertNewUsersData := `UPDATE users_data SET email = $1 WHERE user_id=$2`
-			db.Data.MustExec(queryInsertNewUsersData, &user.Email, &user.Id)
-			c.JSON(http.StatusOK, gin.H{"success": "Email has been changed"})
-		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
-		}
-		return
-	}
-	if strings.ReplaceAll(user.Email, " ", "") == "" && strings.ReplaceAll(user.Username, " ", "") != "" {
-		queryInsertNewUsersData := `UPDATE users_data SET username = $1 WHERE user_id=$2`
-		db.Data.MustExec(queryInsertNewUsersData, &user.Username, &user.Id)
-		c.JSON(http.StatusOK, gin.H{"success": "Username has been changed"})
+	token_string := strings.Split(token, " ")[1]
+
+	claims, err2 := utils.ParseToken(token_string)
+
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	c.Redirect(http.StatusFound, "/admin")
+	auth_user, e := utils.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	if e != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
+		return
+	}
+
+	target, err := utils.GetUsersRoles(db.Data, user.Id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
+		return
+	}
+
+	access := utils.CheckAccess(auth_user.Role, target)
+	if access {
+		if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") != "" {
+			if utils.IsEmailValid(user.Email) {
+				queryInsertNewUsersData := `UPDATE users_data SET email = $2, username = $3 WHERE user_id=$1`
+				db.Data.MustExec(queryInsertNewUsersData, &user.Id, &user.Email, &user.Username)
+				c.JSON(http.StatusOK, gin.H{"success": "Username and Email has been changed"})
+			} else {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
+			}
+			return
+		}
+		if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") == "" {
+			if utils.IsEmailValid(user.Email) {
+				queryInsertNewUsersData := `UPDATE users_data SET email = $1 WHERE user_id=$2`
+				db.Data.MustExec(queryInsertNewUsersData, &user.Email, &user.Id)
+				c.JSON(http.StatusOK, gin.H{"success": "Email has been changed"})
+			} else {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
+			}
+			return
+		}
+		if strings.ReplaceAll(user.Email, " ", "") == "" && strings.ReplaceAll(user.Username, " ", "") != "" {
+			queryInsertNewUsersData := `UPDATE users_data SET username = $1 WHERE user_id=$2`
+			db.Data.MustExec(queryInsertNewUsersData, &user.Username, &user.Id)
+			c.JSON(http.StatusOK, gin.H{"success": "Username has been changed"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusForbidden, gin.H{"error": "no rights to edit this user"})
 }
 
 // Функция добавления роли менеджера админом
@@ -53,9 +83,41 @@ func (db *DataBase) AddRole(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	token := c.GetHeader("Authorization")
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
+	}
+	token_string := strings.Split(token, " ")[1]
+
+	claims, err2 := utils.ParseToken(token_string)
+
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	auth_user, e := utils.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	if e != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
+		return
+	}
+
+	var access bool
+	for _, elem := range auth_user.Role {
+		if elem == "admin" {
+			access = true
+		}
+	}
+	if !access {
+		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to add role"})
+		return
+	}
+
 	queryInsertUsersRole := `INSERT INTO users_roles (user_id, role_id) SELECT users_data.user_id, roles.role_id FROM users_data, roles WHERE users_data.user_id=$1 and roles.role_name=$2;`
 	db.Data.MustExec(queryInsertUsersRole, &role.User_id, &role.Role)
-	c.Redirect(http.StatusFound, "/admin")
+	c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
 }
 
 // Функция удаления роли менеджера админом
@@ -65,9 +127,41 @@ func (db *DataBase) DeleteRole(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	token := c.GetHeader("Authorization")
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
+	}
+	token_string := strings.Split(token, " ")[1]
+
+	claims, err2 := utils.ParseToken(token_string)
+
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	auth_user, e := utils.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	if e != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
+		return
+	}
+
+	var access bool
+	for _, elem := range auth_user.Role {
+		if elem == "admin" {
+			access = true
+		}
+	}
+	if !access {
+		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to add role"})
+		return
+	}
+
 	queryInsertUsersRole := `DELETE FROM users_roles WHERE user_id=$1 and role_id=(SELECT role_id FROM roles WHERE role_name = $2)`
 	db.Data.MustExec(queryInsertUsersRole, &role.User_id, &role.Role)
-	c.Redirect(http.StatusFound, "/admin")
+	c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
 }
 
 // Функция удаления пользователя админом
@@ -77,7 +171,41 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	token := c.GetHeader("Authorization")
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
+	}
+	token_string := strings.Split(token, " ")[1]
+
+	claims, err2 := utils.ParseToken(token_string)
+
+	if err2 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	auth_user, e := utils.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	if e != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
+		return
+	}
+
+	target, err := utils.GetUsersRoles(db.Data, user.Id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
+		return
+	}
+
+	access := utils.CheckAccess(auth_user.Role, target)
+
+	if !access {
+		c.JSON(http.StatusForbidden, gin.H{"error": "no rights to delete this user"})
+		return
+	}
+
 	queryInsertUsersRole := `DELETE FROM users_data WHERE user_id=$1`
 	db.Data.MustExec(queryInsertUsersRole, &user.Id)
-	c.Redirect(http.StatusFound, "/admin")
+	c.JSON(http.StatusOK, gin.H{"success": "user has been deleted"})
 }
