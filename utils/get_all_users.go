@@ -18,26 +18,17 @@ func GetAllUsers(db *sqlx.DB) ([]models.User, error) {
 	defer row.Close()
 	for row.Next() {
 		var current_user models.User
-		var role string
 		if err := row.Scan(&current_user.Id, &current_user.Email, &current_user.Username, &current_user.Password); err != nil {
 			return nil, err
 		}
 
-		getuser_roles := "select roles.role_name from users_data join users_roles on (users_roles.user_id=users_data.user_id) join roles on (roles.role_id=users_roles.role_id) where users_data.email=$1;"
-		roww, err := db.Query(getuser_roles, current_user.Email)
-		if err != nil {
-			return nil, err
+		roles, err_roles := GetUsersRoles(db, current_user.Email)
+		if err_roles != nil {
+			return nil, err_roles
 		}
-		defer roww.Close()
-		for roww.Next() {
-			if err := roww.Scan(&role); err != nil {
-				return nil, err
-			}
-			current_user.Role = append(current_user.Role, role)
-		}
+		current_user.Role = roles
 
 		users_data = append(users_data, current_user)
-		role = ""
 	}
 	return users_data, nil
 }

@@ -54,7 +54,6 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 // Функция для POST запроса авторизации
 func (db *DataBase) Sign_In(c *gin.Context) {
 	var user models.User
-	var role string
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -86,21 +85,12 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 		}
 	}
 
-	getuser_roles := "select roles.role_name from users_data join users_roles on (users_roles.user_id=users_data.user_id) join roles on (roles.role_id=users_roles.role_id) where users_data.email=$1;"
-	roww, err := db.Data.Query(getuser_roles, user.Email)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+	roles, err_roles := utils.GetUsersRoles(db.Data, user.Email)
+	if err_roles != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err_roles})
 		return
 	}
-	defer roww.Close()
-	for roww.Next() {
-		if err := roww.Scan(&role); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
-			return
-		}
-		user.Role = append(user.Role, role)
-		role = ""
-	}
+	user.Role = roles
 
 	expirationTime := time.Now().Add(time.Hour * 24)
 
