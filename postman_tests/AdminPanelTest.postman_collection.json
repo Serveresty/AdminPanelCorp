@@ -1,0 +1,346 @@
+{
+	"info": {
+		"_postman_id": "e9117847-1012-49cd-868f-b87109d9fd5a",
+		"name": "AdminPanelTest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "28291301"
+	},
+	"item": [
+		{
+			"name": "GET_Test",
+			"item": [
+				{
+					"name": "Registration_Page_Test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/sign-up",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"sign-up"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login_Page_Test",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/sign-in",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"sign-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin_Page_Test",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/admin",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"admin"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "POST_Test",
+			"item": [
+				{
+					"name": "Login_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"cs.go.12228@gmail.com\",\r\n    \"password\": \"W5xjMwlCwS\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/login-form",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"login-form"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Solo_Registration_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"email\": \"twitch1010\",\r\n        \"username\": \"Twitch1010\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/registration-form",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"registration-form"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{URL}}/logout-form",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"logout-form"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Multiple_Registration_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "[\r\n    {\r\n        \"email\": \"twitch1010@mail.ru\",\r\n        \"username\": \"Twitch1010\"\r\n    },\r\n    {\r\n        \"email\": \"twitch2020@mail.ru\",\r\n        \"username\": \"Twitch2020\"\r\n    },\r\n    {\r\n        \"email\": \"twitch3030@mail.ru\",\r\n        \"username\": \"Twitch3030\"\r\n    }\r\n]",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/registration-form",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"registration-form"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add_Role_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\": 86,\r\n    \"role\": \"manager\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/add-role",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"add-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_Role_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"user_id\": 71,\r\n    \"role\": \"manager\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/delete-role",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"delete-role"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_User_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{   //Удаление ТОЛЬКО по id пользователя\r\n    \"id\": 83\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/delete-user",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"delete-user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "CSV_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "user_registration",
+									"type": "file",
+									"src": "/C:/Users/nekra/Downloads/RegisterUsersx211.xlsx"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{URL}}/upload",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit_User_Test",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"id\": 1,\r\n    \"email\": \"test2222888@gmail.com\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/edit-user",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"edit-user"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJSb2xlIjpbInVzZXIiLCJtYW5hZ2VyIiwiYWRtaW4iXSwiZXhwIjoxNjg4NjAwMDYyLCJzdWIiOiJjcy5nby4xMjIyOEBnbWFpbC5jb20ifQ.UYTqKn-WlK_VfQbKZGvywRNi26ONnXVaNM-ciIXE808",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
