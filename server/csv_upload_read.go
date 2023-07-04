@@ -7,6 +7,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"regexp"
+	"strings"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gin-gonic/gin"
@@ -72,6 +73,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			if err3 != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 			}
+			c.JSON(http.StatusOK, gin.H{"message": result})
 
 			for _, elem := range result {
 				//Проверка на существование пользователя
@@ -97,6 +99,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			if len(records) > 0 {
 				c.JSON(http.StatusOK, gin.H{"success": "user has been registered"})
 			}
+
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "wrong file"})
 		}
@@ -137,10 +140,18 @@ func readCSVFile(fl multipart.File) ([][]string, error) {
 }
 
 func readXLSXFile(fl multipart.File) ([][]string, error) {
+	var result [][]string
 	f, err := excelize.OpenReader(fl)
 	if err != nil {
 		return nil, err
 	}
 	res := f.GetRows("Лист1")
-	return res, nil
+	for _, elem := range res {
+		if strings.ReplaceAll(elem[0], " ", "") != "" && strings.ReplaceAll(elem[1], " ", "") != "" {
+			result = append(result, []string{elem[0], elem[1]})
+		} else {
+			continue
+		}
+	}
+	return result, nil
 }
