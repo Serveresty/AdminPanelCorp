@@ -85,7 +85,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			}
 
 		} else {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "wrong file"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "unsupported file-type"})
 		}
 	}
 
