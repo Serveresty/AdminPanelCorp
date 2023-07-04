@@ -22,7 +22,7 @@ func GetAllUsers(db *sqlx.DB) ([]models.User, error) {
 			return nil, err
 		}
 
-		roles, err_roles := GetUsersRoles(db, current_user.Email)
+		roles, err_roles := GetUsersRoles(db, current_user.Id)
 		if err_roles != nil {
 			return nil, err_roles
 		}

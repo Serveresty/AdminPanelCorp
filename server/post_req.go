@@ -85,7 +85,7 @@ func (db *DataBase) Sign_In(c *gin.Context) {
 		}
 	}
 
-	roles, err_roles := utils.GetUsersRoles(db.Data, user.Email)
+	roles, err_roles := utils.GetUsersRoles(db.Data, user.Id)
 	if err_roles != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err_roles})
 		return

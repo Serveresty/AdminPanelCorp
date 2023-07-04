@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"regexp"
 
+	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,23 +20,48 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 		return
 	}
 	defer file.Close()
-	res, err2 := handler.Open()
-	if err2 != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err2})
-		return
-	}
-	result, err3 := readCSVFile(res)
-	if err3 != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
+
+	content_type := handler.Header.Get("Content-Type")
+
+	if content_type == "text/csv" || content_type == "text/plain" {
+		res, err2 := handler.Open()
+		if err2 != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err2})
+			return
+		}
+		result, err3 := readCSVFile(res)
+		if err3 != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
+		}
+
+		data, email_error := database.CreateUsers(db.Data, result) //Отправление данных вида (email, username) в функцию создания пользователей
+		if email_error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
+		}
+		err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
+		if err_mail != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+		}
 	}
 
-	data, email_error := database.CreateUsers(db.Data, result) //Отправление данных вида (email, username) в функцию создания пользователей
-	if email_error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
-	}
-	err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
-	if err_mail != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+	if content_type == "application/vnd.ms-excel" || content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
+		res, err2 := handler.Open()
+		if err2 != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err2})
+			return
+		}
+		result, err3 := readXLSXFile(res)
+		if err3 != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
+		}
+		data, email_error := database.CreateUsers(db.Data, result) //Отправление данных вида (email, username) в функцию создания пользователей
+		if email_error != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
+		}
+		err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
+		if err_mail != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "Operation has been completed"})
@@ -70,4 +96,13 @@ func readCSVFile(fl multipart.File) ([][]string, error) {
 		return nil, err
 	}
 	return records, nil
+}
+
+func readXLSXFile(fl multipart.File) ([][]string, error) {
+	f, err := excelize.OpenReader(fl)
+	if err != nil {
+		return nil, err
+	}
+	res := f.GetRows("Лист1")
+	return res, nil
 }
