@@ -14,6 +14,8 @@ import (
 
 // Функция, получающая файл из <input>
 func (db *DataBase) UploadUsers(c *gin.Context) {
+	var err_users [][]string
+	var records [][]string
 	file, handler, err := c.Request.FormFile("user_registration")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -34,7 +36,16 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 		}
 
-		data, email_error := database.CreateUsers(db.Data, result) //Отправление данных вида (email, username) в функцию создания пользователей
+		for _, elem := range result {
+			//Проверка на существование пользователя
+			if utils.IsUserRegistered(db.Data, elem[0], elem[1]) {
+				err_users = append(err_users, elem)
+				continue
+			}
+			records = append(records, []string{elem[0], elem[1]})
+		}
+
+		data, email_error := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
 		if email_error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 		}
@@ -42,8 +53,15 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 		if err_mail != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
 		}
-	} else {
 
+		if len(err_users) > 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": err_users})
+		}
+
+		if len(records) > 0 {
+			c.JSON(http.StatusOK, gin.H{"success": "user has been registered"})
+		}
+	} else {
 		if content_type == "application/vnd.ms-excel" || content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
 			res, err2 := handler.Open()
 			if err2 != nil {
@@ -54,13 +72,30 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			if err3 != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 			}
-			data, email_error := database.CreateUsers(db.Data, result) //Отправление данных вида (email, username) в функцию создания пользователей
+
+			for _, elem := range result {
+				//Проверка на существование пользователя
+				if utils.IsUserRegistered(db.Data, elem[0], elem[1]) {
+					err_users = append(err_users, elem)
+					continue
+				}
+				records = append(records, []string{elem[0], elem[1]})
+			}
+
+			data, email_error := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
 			if email_error != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 			}
 			err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
 			if err_mail != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+			}
+			if len(err_users) > 0 {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": err_users})
+			}
+
+			if len(records) > 0 {
+				c.JSON(http.StatusOK, gin.H{"success": "user has been registered"})
 			}
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "wrong file"})
