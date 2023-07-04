@@ -11,12 +11,11 @@ import (
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
 )
 
 // Функция, получающая файл из <input>
 func (db *DataBase) UploadUsers(c *gin.Context) {
-	var err_users [][]string
-	var records [][]string
 	file, handler, err := c.Request.FormFile("user_registration")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err})
@@ -37,14 +36,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 		}
 
-		for _, elem := range result {
-			//Проверка на существование пользователя
-			if utils.IsUserRegistered(db.Data, elem[0], elem[1]) {
-				err_users = append(err_users, elem)
-				continue
-			}
-			records = append(records, []string{elem[0], elem[1]})
-		}
+		records, err_users := checkRegistration(db.Data, result)
 
 		data, email_error := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
 		if email_error != nil {
@@ -73,16 +65,8 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			if err3 != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 			}
-			c.JSON(http.StatusOK, gin.H{"message": result})
 
-			for _, elem := range result {
-				//Проверка на существование пользователя
-				if utils.IsUserRegistered(db.Data, elem[0], elem[1]) {
-					err_users = append(err_users, elem)
-					continue
-				}
-				records = append(records, []string{elem[0], elem[1]})
-			}
+			records, err_users := checkRegistration(db.Data, result)
 
 			data, email_error := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
 			if email_error != nil {
@@ -154,4 +138,18 @@ func readXLSXFile(fl multipart.File) ([][]string, error) {
 		}
 	}
 	return result, nil
+}
+
+func checkRegistration(db *sqlx.DB, data [][]string) ([][]string, [][]string) {
+	var err_users [][]string
+	var records [][]string
+	for _, elem := range data {
+		//Проверка на существование пользователя
+		if utils.IsUserRegistered(db, elem[0], elem[1]) {
+			err_users = append(err_users, elem)
+			continue
+		}
+		records = append(records, []string{elem[0], elem[1]})
+	}
+	return records, err_users
 }
