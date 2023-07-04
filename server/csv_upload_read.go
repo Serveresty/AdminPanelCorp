@@ -42,25 +42,28 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 		if err_mail != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
 		}
-	}
+	} else {
 
-	if content_type == "application/vnd.ms-excel" || content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
-		res, err2 := handler.Open()
-		if err2 != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err2})
-			return
-		}
-		result, err3 := readXLSXFile(res)
-		if err3 != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
-		}
-		data, email_error := database.CreateUsers(db.Data, result) //Отправление данных вида (email, username) в функцию создания пользователей
-		if email_error != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
-		}
-		err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
-		if err_mail != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+		if content_type == "application/vnd.ms-excel" || content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
+			res, err2 := handler.Open()
+			if err2 != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err2})
+				return
+			}
+			result, err3 := readXLSXFile(res)
+			if err3 != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
+			}
+			data, email_error := database.CreateUsers(db.Data, result) //Отправление данных вида (email, username) в функцию создания пользователей
+			if email_error != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
+			}
+			err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
+			if err_mail != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+			}
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "wrong file"})
 		}
 	}
 
