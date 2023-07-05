@@ -113,8 +113,7 @@ func (db *DataBase) AddRole(c *gin.Context) {
 		return
 	}
 
-	queryInsertUsersRole := `INSERT INTO users_roles (user_id, role_id) SELECT users_data.user_id, roles.role_id FROM users_data, roles WHERE users_data.user_id=$1 and roles.role_name=$2;`
-	db.Data.MustExec(queryInsertUsersRole, &role.User_id, &role.Role)
+	utils.AddRoleToUser(db.Data, role)
 	c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
 }
 
@@ -157,8 +156,7 @@ func (db *DataBase) DeleteRole(c *gin.Context) {
 		return
 	}
 
-	queryInsertUsersRole := `DELETE FROM users_roles WHERE user_id=$1 and role_id=(SELECT role_id FROM roles WHERE role_name = $2)`
-	db.Data.MustExec(queryInsertUsersRole, &role.User_id, &role.Role)
+	utils.DeleteRoleFromUser(db.Data, role)
 	c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
 }
 
@@ -203,7 +201,6 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	queryInsertUsersRole := `DELETE FROM users_data WHERE user_id=$1`
-	db.Data.MustExec(queryInsertUsersRole, &user.Id)
+	utils.DeleteUser(db.Data, user)
 	c.JSON(http.StatusOK, gin.H{"success": "user has been deleted"})
 }
