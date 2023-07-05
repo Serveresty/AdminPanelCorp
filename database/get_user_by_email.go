@@ -1,4 +1,4 @@
-package utils
+package database
 
 import (
 	"AdminPanelCorp/models"
@@ -6,10 +6,10 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func GetUserById(db *sqlx.DB, id int) (models.User, error) {
+func GetUserByEmail(db *sqlx.DB, email string) (models.User, error) {
 	var users_data models.User
-	getuser := "select user_id, email, username, password from users_data where user_id=$1"
-	row, err := db.Query(getuser, id)
+	getuser := "select user_id, email, username, password from users_data where email=$1"
+	row, err := db.Query(getuser, email)
 	if err != nil {
 		return models.User{}, err
 	}

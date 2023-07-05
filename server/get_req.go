@@ -1,6 +1,7 @@
 package server
 
 import (
+	"AdminPanelCorp/database"
 	"AdminPanelCorp/utils"
 	"net/http"
 	"strings"
@@ -82,7 +83,7 @@ func (db *DataBase) AdminPanel(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
 
-	all_users_data, err3 := utils.GetAllUsers(db.Data)
+	all_users_data, err3 := database.GetAllUsers(db.Data)
 
 	if err3 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error while parsing users from db"})

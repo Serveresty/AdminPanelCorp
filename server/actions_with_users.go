@@ -1,6 +1,7 @@
 package server
 
 import (
+	"AdminPanelCorp/database"
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/utils"
 	"net/http"
@@ -31,13 +32,13 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := utils.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	target, err := utils.GetUsersRoles(db.Data, user.Id)
+	target, err := database.GetUsersRoles(db.Data, user.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
@@ -47,8 +48,8 @@ func (db *DataBase) EditUser(c *gin.Context) {
 	if access {
 		if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") != "" {
 			if utils.IsEmailValid(user.Email) {
-				utils.SetEmail(db.Data, user)
-				utils.SetUsername(db.Data, user)
+				database.SetEmail(db.Data, user)
+				database.SetUsername(db.Data, user)
 				c.JSON(http.StatusOK, gin.H{"success": "Username and Email has been changed"})
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
@@ -57,7 +58,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		}
 		if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") == "" {
 			if utils.IsEmailValid(user.Email) {
-				utils.SetEmail(db.Data, user)
+				database.SetEmail(db.Data, user)
 				c.JSON(http.StatusOK, gin.H{"success": "Email has been changed"})
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
@@ -65,7 +66,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 			return
 		}
 		if strings.ReplaceAll(user.Email, " ", "") == "" && strings.ReplaceAll(user.Username, " ", "") != "" {
-			utils.SetUsername(db.Data, user)
+			database.SetUsername(db.Data, user)
 			c.JSON(http.StatusOK, gin.H{"success": "Username has been changed"})
 			return
 		}
@@ -96,7 +97,7 @@ func (db *DataBase) AddRole(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := utils.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
@@ -113,7 +114,7 @@ func (db *DataBase) AddRole(c *gin.Context) {
 		return
 	}
 
-	utils.AddRoleToUser(db.Data, role)
+	database.AddRoleToUser(db.Data, role)
 	c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
 }
 
@@ -139,7 +140,7 @@ func (db *DataBase) DeleteRole(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := utils.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
@@ -156,7 +157,7 @@ func (db *DataBase) DeleteRole(c *gin.Context) {
 		return
 	}
 
-	utils.DeleteRoleFromUser(db.Data, role)
+	database.DeleteRoleFromUser(db.Data, role)
 	c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
 }
 
@@ -182,13 +183,13 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := utils.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	target, err := utils.GetUsersRoles(db.Data, user.Id)
+	target, err := database.GetUsersRoles(db.Data, user.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
@@ -201,6 +202,6 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	utils.DeleteUser(db.Data, user)
+	database.DeleteUser(db.Data, user)
 	c.JSON(http.StatusOK, gin.H{"success": "user has been deleted"})
 }

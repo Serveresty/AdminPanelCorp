@@ -145,7 +145,7 @@ func checkRegistration(db *sqlx.DB, data [][]string) ([][]string, [][]string) {
 	var records [][]string
 	for _, elem := range data {
 		//Проверка на существование пользователя
-		if utils.IsUserRegistered(db, elem[0], elem[1]) {
+		if database.IsUserRegistered(db, elem[0], elem[1]) {
 			err_users = append(err_users, elem)
 			continue
 		}

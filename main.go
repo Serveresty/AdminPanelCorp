@@ -42,15 +42,9 @@ func run() error {
 	}
 
 	//Создаем таблицы с пользователями, ролями и их соответствием
-	err1, err2, err3 := database.CreateTable(db)
+	err1 := database.CreateTable(db)
 	if err1 != nil {
-		log.Fatal("failed to create users_data table: ", err1.Error())
-	}
-	if err2 != nil {
-		log.Fatal("failed to create roles table: ", err2.Error())
-	}
-	if err3 != nil {
-		log.Fatal("failed to create users_roles table: ", err3.Error())
+		log.Fatal("failed to create tables: ", err.Error())
 	}
 
 	gin.SetMode(gin.ReleaseMode)

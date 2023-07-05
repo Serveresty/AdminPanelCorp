@@ -24,7 +24,7 @@ func (db *DataBase) SignUp(c *gin.Context) {
 	}
 	for _, elem := range user {
 		//Проверка на существование пользователя
-		if utils.IsUserRegistered(db.Data, elem.Email, elem.Username) {
+		if database.IsUserRegistered(db.Data, elem.Email, elem.Username) {
 			err_users = append(err_users, elem)
 			continue
 		}
@@ -61,12 +61,12 @@ func (db *DataBase) SignIn(c *gin.Context) {
 	}
 
 	//Проверка на существование пользователя
-	if !utils.IsUserRegistered(db.Data, user.Email, user.Username) {
+	if !database.IsUserRegistered(db.Data, user.Email, user.Username) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user doesn't registered"})
 		return
 	}
 	//Проверка на соответствие паролей в БД с введенным пользователем
-	if err := utils.CheckPassword(db.Data, user.Email, user.Password); err != nil {
+	if err := database.CheckPassword(db.Data, user.Email, user.Password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong password"})
 		return
 	}
@@ -85,7 +85,7 @@ func (db *DataBase) SignIn(c *gin.Context) {
 		}
 	}
 
-	roles, err_roles := utils.GetUsersRoles(db.Data, user.Id)
+	roles, err_roles := database.GetUsersRoles(db.Data, user.Id)
 	if err_roles != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err_roles})
 		return
