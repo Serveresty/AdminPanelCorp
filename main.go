@@ -19,6 +19,12 @@ func init() {
 }
 
 func main() {
+	if err := run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func run() error {
 	//Подключаемся к БД(через структуру Config передаем данные для подключения)
 	db, err := database.DB_Init(&models.Config{
 		Host:     env.GetEnv("Host"),
@@ -52,4 +58,5 @@ func main() {
 	requests.All_Requests(router, db)
 
 	router.Run(":8080")
+	return nil
 }
