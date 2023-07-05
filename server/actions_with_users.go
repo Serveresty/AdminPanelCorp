@@ -46,7 +46,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 
 	access := utils.CheckAccess(auth_user.Role, target)
 	if access {
-		if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") != "" {
+		if user.Email != "" && user.Username != "" {
 			if utils.IsEmailValid(user.Email) {
 				database.SetEmail(db.Data, user)
 				database.SetUsername(db.Data, user)
@@ -56,7 +56,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 			}
 			return
 		}
-		if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") == "" {
+		if user.Email != "" && user.Username == "" {
 			if utils.IsEmailValid(user.Email) {
 				database.SetEmail(db.Data, user)
 				c.JSON(http.StatusOK, gin.H{"success": "Email has been changed"})
@@ -65,7 +65,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 			}
 			return
 		}
-		if strings.ReplaceAll(user.Email, " ", "") == "" && strings.ReplaceAll(user.Username, " ", "") != "" {
+		if user.Email == "" && user.Username != "" {
 			database.SetUsername(db.Data, user)
 			c.JSON(http.StatusOK, gin.H{"success": "Username has been changed"})
 			return
