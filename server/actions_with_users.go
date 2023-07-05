@@ -47,8 +47,8 @@ func (db *DataBase) EditUser(c *gin.Context) {
 	if access {
 		if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") != "" {
 			if utils.IsEmailValid(user.Email) {
-				queryInsertNewUsersData := `UPDATE users_data SET email = $2, username = $3 WHERE user_id=$1`
-				db.Data.MustExec(queryInsertNewUsersData, &user.Id, &user.Email, &user.Username)
+				utils.SetEmail(db.Data, user)
+				utils.SetUsername(db.Data, user)
 				c.JSON(http.StatusOK, gin.H{"success": "Username and Email has been changed"})
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
@@ -57,8 +57,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		}
 		if strings.ReplaceAll(user.Email, " ", "") != "" && strings.ReplaceAll(user.Username, " ", "") == "" {
 			if utils.IsEmailValid(user.Email) {
-				queryInsertNewUsersData := `UPDATE users_data SET email = $1 WHERE user_id=$2`
-				db.Data.MustExec(queryInsertNewUsersData, &user.Email, &user.Id)
+				utils.SetEmail(db.Data, user)
 				c.JSON(http.StatusOK, gin.H{"success": "Email has been changed"})
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
@@ -66,8 +65,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 			return
 		}
 		if strings.ReplaceAll(user.Email, " ", "") == "" && strings.ReplaceAll(user.Username, " ", "") != "" {
-			queryInsertNewUsersData := `UPDATE users_data SET username = $1 WHERE user_id=$2`
-			db.Data.MustExec(queryInsertNewUsersData, &user.Username, &user.Id)
+			utils.SetUsername(db.Data, user)
 			c.JSON(http.StatusOK, gin.H{"success": "Username has been changed"})
 			return
 		}
