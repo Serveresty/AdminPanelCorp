@@ -21,5 +21,6 @@ func AllRequests(route *gin.Engine, DB *sqlx.DB) {
 	route.POST("/add-role", handler_db.AddRole)
 	route.POST("/delete-role", handler_db.DeleteRole)
 	route.POST("/delete-user", handler_db.DeleteUser)
+	route.POST("/add-role-access", handler_db.AddRoleAccess)
 	route.POST("/upload", handler_db.UploadUsers)
 }

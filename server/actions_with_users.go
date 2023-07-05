@@ -5,7 +5,6 @@ import (
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/utils"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	_ "github.com/lib/pq"
@@ -18,16 +17,8 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		return
 	}
 
-	token := c.GetHeader("Authorization")
-	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
-		return
-	}
-	token_string := strings.Split(token, " ")[1]
-
-	claims, err2 := utils.ParseToken(token_string)
-
-	if err2 != nil {
+	claims, err_str := parseInfoFromToken(c)
+	if err_str != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
@@ -83,16 +74,8 @@ func (db *DataBase) AddRole(c *gin.Context) {
 		return
 	}
 
-	token := c.GetHeader("Authorization")
-	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
-		return
-	}
-	token_string := strings.Split(token, " ")[1]
-
-	claims, err2 := utils.ParseToken(token_string)
-
-	if err2 != nil {
+	claims, err_str := parseInfoFromToken(c)
+	if err_str != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
@@ -126,16 +109,8 @@ func (db *DataBase) DeleteRole(c *gin.Context) {
 		return
 	}
 
-	token := c.GetHeader("Authorization")
-	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
-		return
-	}
-	token_string := strings.Split(token, " ")[1]
-
-	claims, err2 := utils.ParseToken(token_string)
-
-	if err2 != nil {
+	claims, err_str := parseInfoFromToken(c)
+	if err_str != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
@@ -169,16 +144,8 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	token := c.GetHeader("Authorization")
-	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
-		return
-	}
-	token_string := strings.Split(token, " ")[1]
-
-	claims, err2 := utils.ParseToken(token_string)
-
-	if err2 != nil {
+	claims, err_str := parseInfoFromToken(c)
+	if err_str != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
