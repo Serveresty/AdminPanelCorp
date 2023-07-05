@@ -13,7 +13,7 @@ import (
 )
 
 // Функция для POST запроса регистрации
-func (db *DataBase) Sign_Up(c *gin.Context) {
+func (db *DataBase) SignUp(c *gin.Context) {
 	var user []models.User
 	var records [][]string
 	var err_users []models.User
@@ -36,7 +36,7 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 	}
 
-	err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
+	err_mail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
 	if err_mail != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
 	}
@@ -52,7 +52,7 @@ func (db *DataBase) Sign_Up(c *gin.Context) {
 }
 
 // Функция для POST запроса авторизации
-func (db *DataBase) Sign_In(c *gin.Context) {
+func (db *DataBase) SignIn(c *gin.Context) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {

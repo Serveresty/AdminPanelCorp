@@ -8,14 +8,14 @@ import (
 )
 
 // Хэндлеры на запросы
-func All_Requests(route *gin.Engine, DB *sqlx.DB) {
+func AllRequests(route *gin.Engine, DB *sqlx.DB) {
 	handler_db := server.DataBase{Data: DB}
-	route.GET("/", handler_db.Home_Page)
-	route.GET("/sign-up", handler_db.Sign_Up_Page)
-	route.GET("/sign-in", handler_db.Sign_In_Page)
-	route.GET("/admin", handler_db.Admin_Panel)
-	route.POST("/login-form", handler_db.Sign_In)
-	route.POST("/registration-form", handler_db.Sign_Up)
+	route.GET("/", handler_db.HomePage)
+	route.GET("/sign-up", handler_db.SignUpPage)
+	route.GET("/sign-in", handler_db.SignInPage)
+	route.GET("/admin", handler_db.AdminPanel)
+	route.POST("/login-form", handler_db.SignIn)
+	route.POST("/registration-form", handler_db.SignUp)
 	route.POST("/logout-form", server.Logout)
 	route.POST("/edit-user", handler_db.EditUser)
 	route.POST("/add-role", handler_db.AddRole)

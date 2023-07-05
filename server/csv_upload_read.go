@@ -42,7 +42,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 		if email_error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 		}
-		err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
+		err_mail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
 		if err_mail != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
 		}
@@ -72,7 +72,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			if email_error != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 			}
-			err_mail := utils.Send_Email(data) //Отправление готовых данных в отправку сообщений на почты
+			err_mail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
 			if err_mail != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
 			}

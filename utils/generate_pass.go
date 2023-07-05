@@ -7,7 +7,7 @@ import (
 )
 
 // Функция генерации пароля
-func Generate_Password() string {
+func GeneratePassword() string {
 	rand.Seed(time.Now().UnixNano())
 	chars := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
 		"abcdefghijklmnopqrstuvwxyz" +

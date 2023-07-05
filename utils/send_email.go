@@ -6,7 +6,7 @@ import (
 )
 
 // Функция отправки данных пользователю на почту
-func Send_Email(data [][]string) [][]string {
+func SendEmail(data [][]string) [][]string {
 	var email_errors [][]string
 	from := env.GetEnv("MAIL")
 	pass := env.GetEnv("MAIL_PASSWORD")

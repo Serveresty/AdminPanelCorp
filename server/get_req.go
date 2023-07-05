@@ -9,7 +9,7 @@ import (
 )
 
 // Главная страница при GET запросе
-func (db *DataBase) Home_Page(c *gin.Context) {
+func (db *DataBase) HomePage(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
@@ -31,7 +31,7 @@ func (db *DataBase) Home_Page(c *gin.Context) {
 }
 
 // Страница авторизации при GET запросе
-func (db *DataBase) Sign_In_Page(c *gin.Context) {
+func (db *DataBase) SignInPage(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 
 	if token != "" {
@@ -42,7 +42,7 @@ func (db *DataBase) Sign_In_Page(c *gin.Context) {
 }
 
 // Страница регистрации при GET запросе
-func (db *DataBase) Sign_Up_Page(c *gin.Context) {
+func (db *DataBase) SignUpPage(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 
 	if token != "" {
@@ -53,7 +53,7 @@ func (db *DataBase) Sign_Up_Page(c *gin.Context) {
 }
 
 // Функция для GET запроса на Админ Панель
-func (db *DataBase) Admin_Panel(c *gin.Context) {
+func (db *DataBase) AdminPanel(c *gin.Context) {
 	var access bool
 
 	token := c.GetHeader("Authorization")

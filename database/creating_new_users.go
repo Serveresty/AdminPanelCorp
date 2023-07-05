@@ -16,7 +16,7 @@ func CreateUsers(db *sqlx.DB, records [][]string) ([][]string, [][]string) {
 
 	for _, element := range records {
 		if utils.IsEmailValid(element[0]) {
-			password := utils.Generate_Password()                                  //Генерация пароля
+			password := utils.GeneratePassword()                                   //Генерация пароля
 			hash_password, _ := utils.HashPassword(password)                       //Хэш пароля
 			db.MustExec(queryInsertNewUser, element[0], element[1], hash_password) //Добавление в базу нового пользователя
 			db.Get(&id, getuser, element[1])                                       //Получить id пользователя по username

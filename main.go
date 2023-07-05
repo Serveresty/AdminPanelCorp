@@ -26,7 +26,7 @@ func main() {
 
 func run() error {
 	//Подключаемся к БД(через структуру Config передаем данные для подключения)
-	db, err := database.DB_Init(&models.Config{
+	db, err := database.DBInit(&models.Config{
 		Host:     env.GetEnv("Host"),
 		Port:     env.GetEnv("Port"),
 		Username: env.GetEnv("Username"),
@@ -42,7 +42,7 @@ func run() error {
 	}
 
 	//Создаем таблицы с пользователями, ролями и их соответствием
-	err1, err2, err3 := database.Create_Table(db)
+	err1, err2, err3 := database.CreateTable(db)
 	if err1 != nil {
 		log.Fatal("failed to create users_data table: ", err1.Error())
 	}
@@ -55,7 +55,7 @@ func run() error {
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
-	requests.All_Requests(router, db)
+	requests.AllRequests(router, db)
 
 	router.Run(":8080")
 	return nil
