@@ -18,7 +18,7 @@ import (
 func (db *DataBase) UploadUsers(c *gin.Context) {
 	file, handler, err := c.Request.FormFile("user_registration")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while try to get file"})
 		return
 	}
 	defer file.Close()
@@ -28,7 +28,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 	if content_type == "text/csv" || content_type == "text/plain" {
 		res, err2 := handler.Open()
 		if err2 != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err2})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "error db while opening file"})
 			return
 		}
 		result, err3 := readCSVFile(res)
@@ -58,7 +58,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 		if content_type == "application/vnd.ms-excel" || content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
 			res, err2 := handler.Open()
 			if err2 != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": err2})
+				c.JSON(http.StatusBadRequest, gin.H{"error": "error db while opening file"})
 				return
 			}
 			result, err3 := readXLSXFile(res)
