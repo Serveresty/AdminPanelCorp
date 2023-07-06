@@ -4,7 +4,7 @@ import "github.com/jmoiron/sqlx"
 
 func AddAccessesToRole(db *sqlx.DB, role string, access_role []string) error {
 	for _, elem := range access_role {
-		if !isAccessAlreadyGranted(db, role, elem) {
+		if isAccessAlreadyGranted(db, role, elem) {
 			role_id, err1 := GetRoleIdByName(db, role)
 			if err1 != nil {
 				return err1

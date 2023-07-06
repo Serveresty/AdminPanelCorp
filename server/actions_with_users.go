@@ -23,19 +23,25 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject) //User from token
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	target, err := database.GetUsersRoles(db.Data, user.Id)
+	roles_id_auth, err := database.GetIdUsersRoles(db.Data, auth_user.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	access := utils.CheckAccess(auth_user.Role, target)
+	target, err := database.GetIdUsersRoles(db.Data, user.Id) //The User being modified
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
+		return
+	}
+
+	access := database.GetAccessesToRole(db.Data, roles_id_auth, target)
 	if access {
 		if user.Email != "" && user.Username != "" {
 			if utils.IsEmailValid(user.Email) {
@@ -86,19 +92,27 @@ func (db *DataBase) AddRole(c *gin.Context) {
 		return
 	}
 
-	var access bool
-	for _, elem := range auth_user.Role {
-		if elem == "admin" {
-			access = true
-		}
-	}
-	if !access {
-		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to add role"})
+	roles_id_auth, err := database.GetIdUsersRoles(db.Data, auth_user.Id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	database.AddRoleToUser(db.Data, role)
-	c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
+	target, err := database.GetIdUsersRoles(db.Data, role.User_id) //The User being modified
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
+		return
+	}
+
+	access := database.GetAccessesToRole(db.Data, roles_id_auth, target)
+
+	if access {
+		database.AddRoleToUser(db.Data, role)
+		c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
+		return
+	}
+
+	c.JSON(http.StatusForbidden, gin.H{"error": "No rights to add role"})
 }
 
 // Функция удаления роли менеджера админом
@@ -121,19 +135,26 @@ func (db *DataBase) DeleteRole(c *gin.Context) {
 		return
 	}
 
-	var access bool
-	for _, elem := range auth_user.Role {
-		if elem == "admin" {
-			access = true
-		}
-	}
-	if !access {
-		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to add role"})
+	roles_id_auth, err := database.GetIdUsersRoles(db.Data, auth_user.Id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	database.DeleteRoleFromUser(db.Data, role)
-	c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
+	target, err := database.GetIdUsersRoles(db.Data, role.User_id) //The User being modified
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
+		return
+	}
+
+	access := database.GetAccessesToRole(db.Data, roles_id_auth, target)
+	if access {
+		database.DeleteRoleFromUser(db.Data, role)
+		c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
+		return
+	}
+
+	c.JSON(http.StatusForbidden, gin.H{"error": "No rights to add role"})
 }
 
 // Функция удаления пользователя админом
@@ -156,19 +177,25 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	target, err := database.GetUsersRoles(db.Data, user.Id)
+	roles_id_auth, err := database.GetIdUsersRoles(db.Data, auth_user.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	access := utils.CheckAccess(auth_user.Role, target)
-
-	if !access {
-		c.JSON(http.StatusForbidden, gin.H{"error": "no rights to delete this user"})
+	target, err := database.GetIdUsersRoles(db.Data, user.Id) //The User being modified
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	database.DeleteUser(db.Data, user)
-	c.JSON(http.StatusOK, gin.H{"success": "user has been deleted"})
+	access := database.GetAccessesToRole(db.Data, roles_id_auth, target)
+
+	if access {
+		database.DeleteUser(db.Data, user)
+		c.JSON(http.StatusOK, gin.H{"success": "user has been deleted"})
+		return
+	}
+
+	c.JSON(http.StatusForbidden, gin.H{"error": "no rights to delete this user"})
 }
