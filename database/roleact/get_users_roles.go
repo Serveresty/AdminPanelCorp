@@ -1,4 +1,4 @@
-package database
+package roleact
 
 import (
 	"github.com/jmoiron/sqlx"

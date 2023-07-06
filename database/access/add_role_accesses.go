@@ -1,15 +1,19 @@
-package database
+package access
 
-import "github.com/jmoiron/sqlx"
+import (
+	"AdminPanelCorp/database/roleact"
+
+	"github.com/jmoiron/sqlx"
+)
 
 func AddAccessesToRole(db *sqlx.DB, role string, access_role []string) error {
 	for _, elem := range access_role {
 		if isAccessAlreadyGranted(db, role, elem) {
-			role_id, err1 := GetRoleIdByName(db, role)
+			role_id, err1 := roleact.GetRoleIdByName(db, role)
 			if err1 != nil {
 				return err1
 			}
-			elem_id, err2 := GetRoleIdByName(db, elem)
+			elem_id, err2 := roleact.GetRoleIdByName(db, elem)
 			if err2 != nil {
 				return err2
 			}

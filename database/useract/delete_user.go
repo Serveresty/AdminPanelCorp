@@ -1,4 +1,4 @@
-package database
+package useract
 
 import (
 	"AdminPanelCorp/models"

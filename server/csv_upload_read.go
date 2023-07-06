@@ -1,7 +1,7 @@
 package server
 
 import (
-	"AdminPanelCorp/database"
+	"AdminPanelCorp/database/useract"
 	"AdminPanelCorp/utils"
 	"bufio"
 	"mime/multipart"
@@ -38,7 +38,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 
 		records, err_users := checkRegistration(db.Data, result)
 
-		data, email_error := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
+		data, email_error := useract.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
 		if email_error != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 		}
@@ -68,7 +68,7 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 
 			records, err_users := checkRegistration(db.Data, result)
 
-			data, email_error := database.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
+			data, email_error := useract.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
 			if email_error != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 			}
@@ -145,7 +145,7 @@ func checkRegistration(db *sqlx.DB, data [][]string) ([][]string, [][]string) {
 	var records [][]string
 	for _, elem := range data {
 		//Проверка на существование пользователя
-		if database.IsUserRegistered(db, elem[0], elem[1]) {
+		if useract.IsUserRegistered(db, elem[0], elem[1]) {
 			err_users = append(err_users, elem)
 			continue
 		}

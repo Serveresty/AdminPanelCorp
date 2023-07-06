@@ -2,6 +2,9 @@ package server
 
 import (
 	"AdminPanelCorp/database"
+	"AdminPanelCorp/database/access"
+	"AdminPanelCorp/database/roleact"
+	"AdminPanelCorp/database/useract"
 	"AdminPanelCorp/env"
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/utils"
@@ -24,14 +27,14 @@ func (db *DataBase) SignUp(c *gin.Context) {
 	}
 	for _, elem := range user {
 		//Проверка на существование пользователя
-		if database.IsUserRegistered(db.Data, elem.Email, elem.Username) {
+		if useract.IsUserRegistered(db.Data, elem.Email, elem.Username) {
 			err_users = append(err_users, elem)
 			continue
 		}
 		records = append(records, []string{elem.Email, elem.Username})
 	}
 
-	data, email_error := database.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
+	data, email_error := useract.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
 	if email_error != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
 	}
@@ -61,7 +64,7 @@ func (db *DataBase) SignIn(c *gin.Context) {
 	}
 
 	//Проверка на существование пользователя
-	if !database.IsUserRegistered(db.Data, user.Email, user.Username) {
+	if !useract.IsUserRegistered(db.Data, user.Email, user.Username) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "user doesn't registered"})
 		return
 	}
@@ -85,7 +88,7 @@ func (db *DataBase) SignIn(c *gin.Context) {
 		}
 	}
 
-	roles, err_roles := database.GetUsersRoles(db.Data, user.Id)
+	roles, err_roles := roleact.GetUsersRoles(db.Data, user.Id)
 	if err_roles != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err_roles})
 		return
@@ -135,7 +138,7 @@ func (db *DataBase) AddRoleAccess(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err1 := database.AddAccessesToRole(db.Data, access_roles.Role, access_roles.AccessRoles)
+	err1 := access.AddAccessesToRole(db.Data, access_roles.Role, access_roles.AccessRoles)
 	if err1 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err1})
 		return

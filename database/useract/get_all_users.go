@@ -1,6 +1,7 @@
-package database
+package useract
 
 import (
+	"AdminPanelCorp/database/roleact"
 	"AdminPanelCorp/models"
 
 	"github.com/jmoiron/sqlx"
@@ -21,8 +22,7 @@ func GetAllUsers(db *sqlx.DB) ([]models.User, error) {
 		if err := row.Scan(&current_user.Id, &current_user.Email, &current_user.Username, &current_user.Password); err != nil {
 			return nil, err
 		}
-
-		roles, err_roles := GetUsersRoles(db, current_user.Id)
+		roles, err_roles := roleact.GetUsersRoles(db, current_user.Id)
 		if err_roles != nil {
 			return nil, err_roles
 		}

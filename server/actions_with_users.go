@@ -1,7 +1,9 @@
 package server
 
 import (
-	"AdminPanelCorp/database"
+	"AdminPanelCorp/database/access"
+	"AdminPanelCorp/database/roleact"
+	"AdminPanelCorp/database/useract"
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/utils"
 	"net/http"
@@ -23,30 +25,30 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject) //User from token
+	auth_user, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject) //User from token
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	roles_id_auth, err := database.GetIdUsersRoles(db.Data, auth_user.Id)
+	roles_id_auth, err := roleact.GetIdUsersRoles(db.Data, auth_user.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	target, err := database.GetIdUsersRoles(db.Data, user.Id) //The User being modified
+	target, err := roleact.GetIdUsersRoles(db.Data, user.Id) //The User being modified
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	access := database.GetAccessesToRole(db.Data, roles_id_auth, target)
+	access := access.GetAccessesToRole(db.Data, roles_id_auth, target)
 	if access {
 		if user.Email != "" && user.Username != "" {
 			if utils.IsEmailValid(user.Email) {
-				database.SetEmail(db.Data, user)
-				database.SetUsername(db.Data, user)
+				useract.SetEmail(db.Data, user)
+				useract.SetUsername(db.Data, user)
 				c.JSON(http.StatusOK, gin.H{"success": "Username and Email has been changed"})
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
@@ -55,7 +57,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		}
 		if user.Email != "" && user.Username == "" {
 			if utils.IsEmailValid(user.Email) {
-				database.SetEmail(db.Data, user)
+				useract.SetEmail(db.Data, user)
 				c.JSON(http.StatusOK, gin.H{"success": "Email has been changed"})
 			} else {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "not valid email"})
@@ -63,7 +65,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 			return
 		}
 		if user.Email == "" && user.Username != "" {
-			database.SetUsername(db.Data, user)
+			useract.SetUsername(db.Data, user)
 			c.JSON(http.StatusOK, gin.H{"success": "Username has been changed"})
 			return
 		}
@@ -86,28 +88,28 @@ func (db *DataBase) AddRole(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	auth_user, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	roles_id_auth, err := database.GetIdUsersRoles(db.Data, auth_user.Id)
+	roles_id_auth, err := roleact.GetIdUsersRoles(db.Data, auth_user.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	target, err := database.GetIdUsersRoles(db.Data, role.User_id) //The User being modified
+	target, err := roleact.GetIdUsersRoles(db.Data, role.User_id) //The User being modified
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	access := database.GetAccessesToRole(db.Data, roles_id_auth, target)
+	access := access.GetAccessesToRole(db.Data, roles_id_auth, target)
 
 	if access {
-		database.AddRoleToUser(db.Data, role)
+		roleact.AddRoleToUser(db.Data, role)
 		c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
 		return
 	}
@@ -129,27 +131,27 @@ func (db *DataBase) DeleteRole(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	auth_user, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	roles_id_auth, err := database.GetIdUsersRoles(db.Data, auth_user.Id)
+	roles_id_auth, err := roleact.GetIdUsersRoles(db.Data, auth_user.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	target, err := database.GetIdUsersRoles(db.Data, role.User_id) //The User being modified
+	target, err := roleact.GetIdUsersRoles(db.Data, role.User_id) //The User being modified
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	access := database.GetAccessesToRole(db.Data, roles_id_auth, target)
+	access := access.GetAccessesToRole(db.Data, roles_id_auth, target)
 	if access {
-		database.DeleteRoleFromUser(db.Data, role)
+		roleact.DeleteRoleFromUser(db.Data, role)
 		c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
 		return
 	}
@@ -171,28 +173,28 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	auth_user, e := database.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	auth_user, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	roles_id_auth, err := database.GetIdUsersRoles(db.Data, auth_user.Id)
+	roles_id_auth, err := roleact.GetIdUsersRoles(db.Data, auth_user.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	target, err := database.GetIdUsersRoles(db.Data, user.Id) //The User being modified
+	target, err := roleact.GetIdUsersRoles(db.Data, user.Id) //The User being modified
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	access := database.GetAccessesToRole(db.Data, roles_id_auth, target)
+	access := access.GetAccessesToRole(db.Data, roles_id_auth, target)
 
 	if access {
-		database.DeleteUser(db.Data, user)
+		useract.DeleteUser(db.Data, user)
 		c.JSON(http.StatusOK, gin.H{"success": "user has been deleted"})
 		return
 	}

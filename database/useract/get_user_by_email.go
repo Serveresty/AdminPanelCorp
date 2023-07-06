@@ -1,15 +1,16 @@
-package database
+package useract
 
 import (
+	"AdminPanelCorp/database/roleact"
 	"AdminPanelCorp/models"
 
 	"github.com/jmoiron/sqlx"
 )
 
-func GetUserById(db *sqlx.DB, id int) (models.User, error) {
+func GetUserByEmail(db *sqlx.DB, email string) (models.User, error) {
 	var users_data models.User
-	getuser := "select user_id, email, username, password from users_data where user_id=$1"
-	row, err := db.Query(getuser, id)
+	getuser := "select user_id, email, username, password from users_data where email=$1"
+	row, err := db.Query(getuser, email)
 	if err != nil {
 		return models.User{}, err
 	}
@@ -20,7 +21,7 @@ func GetUserById(db *sqlx.DB, id int) (models.User, error) {
 			return models.User{}, err
 		}
 
-		roles, err_roles := GetUsersRoles(db, users_data.Id)
+		roles, err_roles := roleact.GetUsersRoles(db, users_data.Id)
 		if err_roles != nil {
 			return models.User{}, err_roles
 		}

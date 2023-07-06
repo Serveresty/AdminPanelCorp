@@ -1,4 +1,4 @@
-package database
+package useract
 
 import "github.com/jmoiron/sqlx"
 
