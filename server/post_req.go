@@ -145,3 +145,17 @@ func (db *DataBase) AddRoleAccess(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"success": "Access to role granted"})
 }
+
+func (db *DataBase) DeleteRoleAccess(c *gin.Context) {
+	var access_roles models.AccessRoles
+	if err := c.ShouldBindJSON(&access_roles); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err1 := access.DeleteAccessesFromRole(db.Data, access_roles.Role, access_roles.AccessRoles)
+	if err1 != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err1})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"success": "Access to role taken away"})
+}
