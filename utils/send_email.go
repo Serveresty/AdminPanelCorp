@@ -7,7 +7,7 @@ import (
 
 // Функция отправки данных пользователю на почту
 func SendEmail(data [][]string) [][]string {
-	var email_errors [][]string
+	var emailErrors [][]string
 	from := env.GetEnv("MAIL")
 	pass := env.GetEnv("MAIL_PASSWORD")
 	host := "smtp.gmail.com"
@@ -25,9 +25,9 @@ func SendEmail(data [][]string) [][]string {
 		m = append(m, data[i][0])
 		err := smtp.SendMail(address, auth, from, m, msg)
 		if err != nil {
-			email_errors = append(email_errors, []string{data[i][0], "not valid email"})
+			emailErrors = append(emailErrors, []string{data[i][0], "not valid email"})
 		}
 		m = nil
 	}
-	return email_errors
+	return emailErrors
 }

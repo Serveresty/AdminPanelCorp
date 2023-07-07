@@ -7,11 +7,11 @@ import (
 	"github.com/lib/pq"
 )
 
-func GetAccessesToRole(db *sqlx.DB, roles []int, target_roles []int) bool {
+func GetAccessesToRole(db *sqlx.DB, roles []int, targetRoles []int) bool {
 	var rl int
-	var all_roles []int
-	getuser_accesses := "select access_to from access_roles where role_id = any ($1);"
-	roww, err := db.Query(getuser_accesses, pq.Array(roles))
+	var allRoles []int
+	getuserAccesses := "select access_to from access_roles where role_id = any ($1);"
+	roww, err := db.Query(getuserAccesses, pq.Array(roles))
 	if err != nil {
 		return false
 	}
@@ -20,11 +20,11 @@ func GetAccessesToRole(db *sqlx.DB, roles []int, target_roles []int) bool {
 		if err := roww.Scan(&rl); err != nil {
 			return false
 		}
-		all_roles = append(all_roles, rl)
+		allRoles = append(allRoles, rl)
 	}
 
-	check_list := utils.Intersection(all_roles, target_roles)
-	if len(check_list) == len(target_roles) {
+	checkList := utils.Intersection(allRoles, targetRoles)
+	if len(checkList) == len(targetRoles) {
 		return true
 	}
 

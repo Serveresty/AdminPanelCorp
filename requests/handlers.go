@@ -9,19 +9,19 @@ import (
 
 // Хэндлеры на запросы
 func AllRequests(route *gin.Engine, DB *sqlx.DB) {
-	handler_db := server.DataBase{Data: DB}
-	route.GET("/", handler_db.HomePage)
-	route.GET("/sign-up", handler_db.SignUpPage)
-	route.GET("/sign-in", handler_db.SignInPage)
-	route.GET("/admin", handler_db.AdminPanel)
-	route.POST("/login-form", handler_db.SignIn)
-	route.POST("/registration-form", handler_db.SignUp)
+	handlerDB := server.DataBase{Data: DB}
+	route.GET("/", handlerDB.HomePage)
+	route.GET("/sign-up", handlerDB.SignUpPage)
+	route.GET("/sign-in", handlerDB.SignInPage)
+	route.GET("/admin", handlerDB.AdminPanel)
+	route.POST("/login-form", handlerDB.SignIn)
+	route.POST("/registration-form", handlerDB.SignUp)
 	route.POST("/logout-form", server.Logout)
-	route.POST("/edit-user", handler_db.EditUser)
-	route.POST("/add-role", handler_db.AddRole)
-	route.POST("/delete-role", handler_db.DeleteRole)
-	route.POST("/delete-user", handler_db.DeleteUser)
-	route.POST("/add-role-access", handler_db.AddRoleAccess)
-	route.POST("/delete-role-access", handler_db.DeleteRoleAccess)
-	route.POST("/upload", handler_db.UploadUsers)
+	route.POST("/edit-user", handlerDB.EditUser)
+	route.POST("/add-role", handlerDB.AddRole)
+	route.POST("/delete-role", handlerDB.DeleteRole)
+	route.POST("/delete-user", handlerDB.DeleteUser)
+	route.POST("/add-role-access", handlerDB.AddRoleAccess)
+	route.POST("/delete-role-access", handlerDB.DeleteRoleAccess)
+	route.POST("/upload", handlerDB.UploadUsers)
 }

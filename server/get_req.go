@@ -9,8 +9,8 @@ import (
 
 // Главная страница при GET запросе
 func (db *DataBase) HomePage(c *gin.Context) {
-	claims, err_str := parseInfoFromToken(c)
-	if err_str != "" {
+	claims, errStr := parseInfoFromToken(c)
+	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
@@ -48,8 +48,8 @@ func (db *DataBase) SignUpPage(c *gin.Context) {
 func (db *DataBase) AdminPanel(c *gin.Context) {
 	var access bool
 
-	claims, err_str := parseInfoFromToken(c)
-	if err_str != "" {
+	claims, errStr := parseInfoFromToken(c)
+	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
@@ -67,11 +67,11 @@ func (db *DataBase) AdminPanel(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
 
-	all_users_data, err3 := useract.GetAllUsers(db.Data)
+	allUsersData, err3 := useract.GetAllUsers(db.Data)
 
 	if err3 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error while parsing users from db"})
 	}
 
-	c.JSON(http.StatusOK, all_users_data)
+	c.JSON(http.StatusOK, allUsersData)
 }

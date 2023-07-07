@@ -13,9 +13,9 @@ func parseInfoFromToken(c *gin.Context) (*models.Claims, string) {
 	if token == "" {
 		return nil, "unauthorized"
 	}
-	token_string := strings.Split(token, " ")[1]
+	tokenString := strings.Split(token, " ")[1]
 
-	claims, err2 := utils.ParseToken(token_string)
+	claims, err2 := utils.ParseToken(tokenString)
 
 	if err2 != nil {
 		return nil, "unauthorized"

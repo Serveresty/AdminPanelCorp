@@ -23,9 +23,9 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 	}
 	defer file.Close()
 
-	content_type := handler.Header.Get("Content-Type")
+	contentType := handler.Header.Get("Content-Type")
 
-	if content_type == "text/csv" || content_type == "text/plain" {
+	if contentType == "text/csv" || contentType == "text/plain" {
 		res, err2 := handler.Open()
 		if err2 != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "error db while opening file"})
@@ -36,26 +36,26 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 		}
 
-		records, err_users := checkRegistration(db.Data, result)
+		records, errUsers := checkRegistration(db.Data, result)
 
-		data, email_error := useract.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
-		if email_error != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
+		data, emailError := useract.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
+		if emailError != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": emailError})
 		}
-		err_mail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
-		if err_mail != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+		errMail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
+		if errMail != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": errMail})
 		}
 
-		if len(err_users) > 0 {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": err_users})
+		if len(errUsers) > 0 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": errUsers})
 		}
 
 		if len(records) > 0 {
 			c.JSON(http.StatusOK, gin.H{"success": "user has been registered"})
 		}
 	} else {
-		if content_type == "application/vnd.ms-excel" || content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
+		if contentType == "application/vnd.ms-excel" || contentType == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" {
 			res, err2 := handler.Open()
 			if err2 != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "error db while opening file"})
@@ -66,18 +66,18 @@ func (db *DataBase) UploadUsers(c *gin.Context) {
 				c.JSON(http.StatusBadRequest, gin.H{"error": "Error while reading file"})
 			}
 
-			records, err_users := checkRegistration(db.Data, result)
+			records, errUsers := checkRegistration(db.Data, result)
 
-			data, email_error := useract.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
-			if email_error != nil {
-				c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
+			data, emailError := useract.CreateUsers(db.Data, records) //Отправление данных вида (email, username) в функцию создания пользователей
+			if emailError != nil {
+				c.JSON(http.StatusBadRequest, gin.H{"error": emailError})
 			}
 			err_mail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
 			if err_mail != nil {
 				c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
 			}
-			if len(err_users) > 0 {
-				c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": err_users})
+			if len(errUsers) > 0 {
+				c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": errUsers})
 			}
 
 			if len(records) > 0 {
@@ -141,15 +141,15 @@ func readXLSXFile(fl multipart.File) ([][]string, error) {
 }
 
 func checkRegistration(db *sqlx.DB, data [][]string) ([][]string, [][]string) {
-	var err_users [][]string
+	var errUsers [][]string
 	var records [][]string
 	for _, elem := range data {
 		//Проверка на существование пользователя
 		if useract.IsUserRegistered(db, elem[0], elem[1]) {
-			err_users = append(err_users, elem)
+			errUsers = append(errUsers, elem)
 			continue
 		}
 		records = append(records, []string{elem[0], elem[1]})
 	}
-	return records, err_users
+	return records, errUsers
 }

@@ -19,7 +19,7 @@ import (
 func (db *DataBase) SignUp(c *gin.Context) {
 	var user []models.User
 	var records [][]string
-	var err_users []models.User
+	var errUsers []models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -28,24 +28,24 @@ func (db *DataBase) SignUp(c *gin.Context) {
 	for _, elem := range user {
 		//Проверка на существование пользователя
 		if useract.IsUserRegistered(db.Data, elem.Email, elem.Username) {
-			err_users = append(err_users, elem)
+			errUsers = append(errUsers, elem)
 			continue
 		}
 		records = append(records, []string{elem.Email, elem.Username})
 	}
 
-	data, email_error := useract.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
-	if email_error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": email_error})
+	data, emailError := useract.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
+	if emailError != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": emailError})
 	}
 
-	err_mail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
-	if err_mail != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err_mail})
+	errMail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
+	if errMail != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": errMail})
 	}
 
-	if len(err_users) > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": err_users})
+	if len(errUsers) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": errUsers})
 	}
 
 	if len(records) > 0 {
@@ -88,9 +88,9 @@ func (db *DataBase) SignIn(c *gin.Context) {
 		}
 	}
 
-	roles, err_roles := roleact.GetUsersRoles(db.Data, user.Id)
-	if err_roles != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err_roles})
+	roles, errRoles := roleact.GetUsersRoles(db.Data, user.Id)
+	if errRoles != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": errRoles})
 		return
 	}
 	user.Role = roles
@@ -119,9 +119,6 @@ func (db *DataBase) SignIn(c *gin.Context) {
 	bearer := "Bearer " + tokenString
 	c.Header("Authorization", bearer)
 
-	//Создание куки
-	//c.SetCookie("token", tokenString, int(expirationTime.Unix()), "/", "localhost", false, true)
-
 	c.JSON(http.StatusOK, gin.H{"success": "user logged in"})
 }
 
@@ -133,12 +130,12 @@ func Logout(c *gin.Context) {
 }
 
 func (db *DataBase) AddRoleAccess(c *gin.Context) {
-	var access_roles models.AccessRoles
-	if err := c.ShouldBindJSON(&access_roles); err != nil {
+	var accessRoles models.AccessRoles
+	if err := c.ShouldBindJSON(&accessRoles); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err1 := access.AddAccessesToRole(db.Data, access_roles.Role, access_roles.AccessRoles)
+	err1 := access.AddAccessesToRole(db.Data, accessRoles.Role, accessRoles.AccessRoles)
 	if err1 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err1})
 		return
@@ -147,12 +144,12 @@ func (db *DataBase) AddRoleAccess(c *gin.Context) {
 }
 
 func (db *DataBase) DeleteRoleAccess(c *gin.Context) {
-	var access_roles models.AccessRoles
-	if err := c.ShouldBindJSON(&access_roles); err != nil {
+	var accessRoles models.AccessRoles
+	if err := c.ShouldBindJSON(&accessRoles); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err1 := access.DeleteAccessesFromRole(db.Data, access_roles.Role, access_roles.AccessRoles)
+	err1 := access.DeleteAccessesFromRole(db.Data, accessRoles.Role, accessRoles.AccessRoles)
 	if err1 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err1})
 		return

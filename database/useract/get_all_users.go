@@ -9,7 +9,7 @@ import (
 
 // Функция для админ панели на получение всех зарегистрированных пользователей
 func GetAllUsers(db *sqlx.DB) ([]models.User, error) {
-	var users_data []models.User
+	var usersData []models.User
 	getuser := "select user_id, email, username, password from users_data"
 	row, err := db.Query(getuser)
 	if err != nil {
@@ -18,17 +18,17 @@ func GetAllUsers(db *sqlx.DB) ([]models.User, error) {
 
 	defer row.Close()
 	for row.Next() {
-		var current_user models.User
-		if err := row.Scan(&current_user.Id, &current_user.Email, &current_user.Username, &current_user.Password); err != nil {
+		var currentUser models.User
+		if err := row.Scan(&currentUser.Id, &currentUser.Email, &currentUser.Username, &currentUser.Password); err != nil {
 			return nil, err
 		}
-		roles, err_roles := roleact.GetUsersRoles(db, current_user.Id)
+		roles, err_roles := roleact.GetUsersRoles(db, currentUser.Id)
 		if err_roles != nil {
 			return nil, err_roles
 		}
-		current_user.Role = roles
+		currentUser.Role = roles
 
-		users_data = append(users_data, current_user)
+		usersData = append(usersData, currentUser)
 	}
-	return users_data, nil
+	return usersData, nil
 }

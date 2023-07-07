@@ -8,7 +8,7 @@ import (
 )
 
 func GetUserByEmail(db *sqlx.DB, email string) (models.User, error) {
-	var users_data models.User
+	var usersData models.User
 	getuser := "select user_id, email, username, password from users_data where email=$1"
 	row, err := db.Query(getuser, email)
 	if err != nil {
@@ -17,16 +17,16 @@ func GetUserByEmail(db *sqlx.DB, email string) (models.User, error) {
 
 	defer row.Close()
 	for row.Next() {
-		if err := row.Scan(&users_data.Id, &users_data.Email, &users_data.Username, &users_data.Password); err != nil {
+		if err := row.Scan(&usersData.Id, &usersData.Email, &usersData.Username, &usersData.Password); err != nil {
 			return models.User{}, err
 		}
 
-		roles, err_roles := roleact.GetUsersRoles(db, users_data.Id)
-		if err_roles != nil {
-			return models.User{}, err_roles
+		roles, errRoles := roleact.GetUsersRoles(db, usersData.Id)
+		if errRoles != nil {
+			return models.User{}, errRoles
 		}
-		users_data.Role = roles
+		usersData.Role = roles
 
 	}
-	return users_data, nil
+	return usersData, nil
 }

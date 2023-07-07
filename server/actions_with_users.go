@@ -19,19 +19,19 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		return
 	}
 
-	claims, err_str := parseInfoFromToken(c)
-	if err_str != "" {
+	claims, errStr := parseInfoFromToken(c)
+	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	auth_user, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject) //User from token
+	authUser, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject) //User from token
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	roles_id_auth, err := roleact.GetIdUsersRoles(db.Data, auth_user.Id)
+	rolesIdAuth, err := roleact.GetIdUsersRoles(db.Data, authUser.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
@@ -43,7 +43,7 @@ func (db *DataBase) EditUser(c *gin.Context) {
 		return
 	}
 
-	access := access.GetAccessesToRole(db.Data, roles_id_auth, target)
+	access := access.GetAccessesToRole(db.Data, rolesIdAuth, target)
 	if access {
 		if user.Email != "" && user.Username != "" {
 			if utils.IsEmailValid(user.Email) {
@@ -82,31 +82,31 @@ func (db *DataBase) AddRole(c *gin.Context) {
 		return
 	}
 
-	claims, err_str := parseInfoFromToken(c)
-	if err_str != "" {
+	claims, errStr := parseInfoFromToken(c)
+	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	auth_user, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	authUser, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	roles_id_auth, err := roleact.GetIdUsersRoles(db.Data, auth_user.Id)
+	rolesIdAuth, err := roleact.GetIdUsersRoles(db.Data, authUser.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	target, err := roleact.GetIdUsersRoles(db.Data, role.User_id) //The User being modified
+	target, err := roleact.GetIdUsersRoles(db.Data, role.UserId) //The User being modified
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	access := access.GetAccessesToRole(db.Data, roles_id_auth, target)
+	access := access.GetAccessesToRole(db.Data, rolesIdAuth, target)
 
 	if access {
 		roleact.AddRoleToUser(db.Data, role)
@@ -125,31 +125,31 @@ func (db *DataBase) DeleteRole(c *gin.Context) {
 		return
 	}
 
-	claims, err_str := parseInfoFromToken(c)
-	if err_str != "" {
+	claims, errStr := parseInfoFromToken(c)
+	if errStr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	auth_user, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	authUser, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	roles_id_auth, err := roleact.GetIdUsersRoles(db.Data, auth_user.Id)
+	rolesIdAuth, err := roleact.GetIdUsersRoles(db.Data, authUser.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	target, err := roleact.GetIdUsersRoles(db.Data, role.User_id) //The User being modified
+	target, err := roleact.GetIdUsersRoles(db.Data, role.UserId) //The User being modified
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
 	}
 
-	access := access.GetAccessesToRole(db.Data, roles_id_auth, target)
+	access := access.GetAccessesToRole(db.Data, rolesIdAuth, target)
 	if access {
 		roleact.DeleteRoleFromUser(db.Data, role)
 		c.JSON(http.StatusOK, gin.H{"success": "role has been added"})
@@ -167,19 +167,19 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	claims, err_str := parseInfoFromToken(c)
-	if err_str != "" {
+	claims, errAtr := parseInfoFromToken(c)
+	if errAtr != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
 
-	auth_user, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
+	authUser, e := useract.GetUserByEmail(db.Data, claims.StandardClaims.Subject)
 	if e != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error db while get user"})
 		return
 	}
 
-	roles_id_auth, err := roleact.GetIdUsersRoles(db.Data, auth_user.Id)
+	rolesIdAuth, err := roleact.GetIdUsersRoles(db.Data, authUser.Id)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "error db while get roles"})
 		return
@@ -191,7 +191,7 @@ func (db *DataBase) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	access := access.GetAccessesToRole(db.Data, roles_id_auth, target)
+	access := access.GetAccessesToRole(db.Data, rolesIdAuth, target)
 
 	if access {
 		useract.DeleteUser(db.Data, user)
