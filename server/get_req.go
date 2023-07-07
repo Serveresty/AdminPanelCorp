@@ -2,25 +2,16 @@ package server
 
 import (
 	"AdminPanelCorp/database/useract"
-	"AdminPanelCorp/utils"
 	"net/http"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 // Главная страница при GET запросе
 func (db *DataBase) HomePage(c *gin.Context) {
-	token := c.GetHeader("Authorization")
-	if token == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-		return
-	}
-
-	claims, err := utils.ParseToken(token)
-
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+	claims, err_str := parseInfoFromToken(c)
+	if err_str != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
 
@@ -57,16 +48,8 @@ func (db *DataBase) SignUpPage(c *gin.Context) {
 func (db *DataBase) AdminPanel(c *gin.Context) {
 	var access bool
 
-	token := c.GetHeader("Authorization")
-	if token == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
-		return
-	}
-	token_string := strings.Split(token, " ")[1]
-
-	claims, err2 := utils.ParseToken(token_string)
-
-	if err2 != nil {
+	claims, err_str := parseInfoFromToken(c)
+	if err_str != "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
 		return
 	}
@@ -76,6 +59,7 @@ func (db *DataBase) AdminPanel(c *gin.Context) {
 			access = true
 		}
 	}
+
 	if !access {
 		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to access this page"})
 		return
