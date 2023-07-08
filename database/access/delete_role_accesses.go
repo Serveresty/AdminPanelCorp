@@ -8,15 +8,15 @@ import (
 
 func DeleteAccessesFromRole(db *sqlx.DB, role string, accessRole []string) error {
 	for _, elem := range accessRole {
-		if !isAccessAlreadyGranted(db, role, elem) {
-			roleId, err1 := roleact.GetRoleIdByName(db, role)
-			if err1 != nil {
-				return err1
-			}
-			elemId, err2 := roleact.GetRoleIdByName(db, elem)
-			if err2 != nil {
-				return err2
-			}
+		roleId, err1 := roleact.GetRoleIdByName(db, role)
+		if err1 != nil {
+			return err1
+		}
+		elemId, err2 := roleact.GetRoleIdByName(db, elem)
+		if err2 != nil {
+			return err2
+		}
+		if isAccessAlreadyGranted(db, roleId, elemId) {
 			queryInsertNewAccess := `DELETE FROM access_roles WHERE role_id=$1 and access_to=$2`
 			db.MustExec(queryInsertNewAccess, roleId, elemId)
 		}
