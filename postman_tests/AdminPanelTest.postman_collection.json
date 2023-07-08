@@ -84,7 +84,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"email\": \"cs.go.12228@gmail.com\",\r\n    \"password\": \"W5xjMwlCwS\"\r\n}",
+							"raw": "{\r\n    \"email\": \"cs.go.12228@gmail.com\",\r\n    \"password\": \"tCN9yjOuh5\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -110,7 +110,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "[\r\n    {\r\n        \"email\": \"twitch1010\",\r\n        \"username\": \"Twitch1010\"\r\n    }\r\n]",
+							"raw": "[\r\n    {\r\n        \"email\": \"nananana189981@gmail.com\",\r\n        \"username\": \"Gyk\"\r\n    }\r\n]",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -179,7 +179,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"user_id\": 86,\r\n    \"role\": \"manager\"\r\n}",
+							"raw": "{\r\n    \"user_id\": 2,\r\n    \"role\": \"manager\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -205,7 +205,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"user_id\": 71,\r\n    \"role\": \"manager\"\r\n}",
+							"raw": "{\r\n    \"user_id\": 2,\r\n    \"role\": \"manager\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -231,7 +231,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{   //Удаление ТОЛЬКО по id пользователя\r\n    \"id\": 83\r\n}",
+							"raw": "{   //Удаление ТОЛЬКО по id пользователя\r\n    \"id\": 4\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -284,7 +284,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": 1,\r\n    \"email\": \"test2222888@gmail.com\"\r\n}",
+							"raw": "{\r\n    \"id\": 86,\r\n    \"email\": \"yapi@mail.ru\",\r\n    \"username\": \"kkkkkk111\"\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -302,6 +302,58 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Add_Role_Access",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"role\": \"admin\",\r\n    \"access_roles\": [\"user\",\"manager\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/add-role-access",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"add-role-access"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete_Role_Access",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"role\": \"admin\",\r\n    \"access_roles\": [\"user\",\"manager\"]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/delete-role-access",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"delete-role-access"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -311,7 +363,7 @@
 		"bearer": [
 			{
 				"key": "token",
-				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJSb2xlIjpbInVzZXIiLCJtYW5hZ2VyIiwiYWRtaW4iXSwiZXhwIjoxNjg4NjAwMDYyLCJzdWIiOiJjcy5nby4xMjIyOEBnbWFpbC5jb20ifQ.UYTqKn-WlK_VfQbKZGvywRNi26ONnXVaNM-ciIXE808",
+				"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJSb2xlIjpbInVzZXIiLCJtYW5hZ2VyIiwiYWRtaW4iXSwiZXhwIjoxNjg4OTA2NDg2LCJzdWIiOiJjcy5nby4xMjIyOEBnbWFpbC5jb20ifQ.YHePDh88i8E54mj7X99hMPurdJcvC8eapbQXTzoBsh0",
 				"type": "string"
 			}
 		]

@@ -6,7 +6,7 @@ import (
 
 func GetRoleIdByName(db *sqlx.DB, roleName string) (int, error) {
 	var roleId int
-	getrole := "select role_name from roles where role_name=$1"
+	getrole := "select role_id from roles where role_name=$1"
 	row, err := db.Query(getrole, roleName)
 	if err != nil {
 		return 0, err
