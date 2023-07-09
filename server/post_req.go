@@ -135,6 +135,26 @@ func (db *DataBase) AddRoleAccess(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	var isAccess bool
+
+	claims, errStr := parseInfoFromToken(c)
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	for _, k := range claims.Role {
+		if k == "admin" {
+			isAccess = true
+		}
+	}
+
+	if !isAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to action"})
+		return
+	}
+
 	err1 := access.AddAccessesToRole(db.Data, accessRoles.Role, accessRoles.AccessRoles)
 	if err1 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error while adding access to role"})
@@ -149,6 +169,26 @@ func (db *DataBase) DeleteRoleAccess(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	var isAccess bool
+
+	claims, errStr := parseInfoFromToken(c)
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
+	}
+
+	for _, k := range claims.Role {
+		if k == "admin" {
+			isAccess = true
+		}
+	}
+
+	if !isAccess {
+		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to action"})
+		return
+	}
+
 	err1 := access.DeleteAccessesFromRole(db.Data, accessRoles.Role, accessRoles.AccessRoles)
 	if err1 != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "error while deleting access to role"})
