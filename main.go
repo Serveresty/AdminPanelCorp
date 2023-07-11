@@ -5,9 +5,16 @@ import (
 	"AdminPanelCorp/env"
 	"AdminPanelCorp/models"
 	"AdminPanelCorp/requests"
+	"fmt"
 	"log"
 
+	apiclient "AdminPanelCorp/docs/output_swag/client"
+	"AdminPanelCorp/docs/output_swag/client/example"
+
+	httptransport "github.com/go-openapi/runtime/client"
+
 	"github.com/gin-gonic/gin"
+	"github.com/go-openapi/strfmt"
 	"github.com/joho/godotenv"
 )
 
@@ -22,14 +29,25 @@ func init() {
 // @version 1.0
 // @description API Server
 
-// @host localhost:8080
-// @BasePath /
+// @host localhost:80
+// @BasePath /api/v1
 
 // @securityDefinitions.apikey ApiKeyAuth
 // @in header
 // @name Authorization
 
 func main() {
+	transport := httptransport.New("localhost:80", apiclient.DefaultBasePath, nil)
+
+	// create the API client, with the transport
+	clientt := apiclient.New(transport, strfmt.Default)
+
+	resp, err := clientt.Example.GetExampleHelloworld(example.NewGetExampleHelloworldParams())
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("%#v\n", resp)
+
 	if err := run(); err != nil {
 		log.Fatal(err)
 	}
@@ -60,6 +78,7 @@ func run() error {
 
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.New()
+
 	requests.AllRequests(router, db)
 
 	router.Run(":8080")

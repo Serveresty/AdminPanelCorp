@@ -7,7 +7,23 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @BasePath /api/v1
+
+// PingExample godoc
+// @Summary ping example
+// @Schemes
+// @Description do ping
+// @Tags example
+// @Accept json
+// @Produce json
+// @Success 200 {string} Helloworld
+// @Router /example/helloworld [get]
+func Helloworld(g *gin.Context) {
+	g.JSON(http.StatusOK, "helloworld")
+}
+
 // Главная страница при GET запросе
+
 func (db *DataBase) HomePage(c *gin.Context) {
 	claims, errStr := parseInfoFromToken(c)
 	if errStr != "" {
@@ -23,18 +39,6 @@ func (db *DataBase) HomePage(c *gin.Context) {
 }
 
 // Страница авторизации при GET запросе
-
-// @BasePath /api/v1
-
-// PingExample godoc
-// @Summary SignIn
-// @Tags auth
-// @Description login
-// @Accept json
-// @Produce json
-// @Success 200 {string} string "success"
-// @Failure 400 {string} string "error"
-// @Router /auth/sign-in [get]
 func (db *DataBase) SignInPage(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 
@@ -47,17 +51,14 @@ func (db *DataBase) SignInPage(c *gin.Context) {
 
 // Страница регистрации при GET запросе
 
-// @BasePath /api/v1
-
 // PingExample godoc
 // @Summary SignUp
 // @Tags auth
 // @Description create account
-// @Accept json
 // @Produce json
 // @Success 200 {string} string "success"
 // @Failure 400 {string} string "error"
-// @Router /auth/sign-up [get]
+// @Router /api/v1/auth/sign-up [get]
 func (db *DataBase) SignUpPage(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 

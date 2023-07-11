@@ -16,6 +16,32 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/v1/auth/sign-up": {
+            "get": {
+                "description": "create account",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "SignUp",
+                "responses": {
+                    "200": {
+                        "description": "success",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login-form": {
             "post": {
                 "description": "login",
@@ -139,9 +165,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/sign-in": {
+        "/example/helloworld": {
             "get": {
-                "description": "login",
+                "description": "do ping",
                 "consumes": [
                     "application/json"
                 ],
@@ -149,47 +175,12 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "auth"
+                    "example"
                 ],
-                "summary": "SignIn",
+                "summary": "ping example",
                 "responses": {
                     "200": {
-                        "description": "success",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/sign-up": {
-            "get": {
-                "description": "create account",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "SignUp",
-                "responses": {
-                    "200": {
-                        "description": "success",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "error",
+                        "description": "OK",
                         "schema": {
                             "type": "string"
                         }
@@ -246,8 +237,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:8080",
-	BasePath:         "/",
+	Host:             "localhost:80",
+	BasePath:         "/api/v1",
 	Schemes:          []string{},
 	Title:            "Admin Panel API",
 	Description:      "API Server",

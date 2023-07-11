@@ -1,9 +1,10 @@
 package requests
 
 import (
+	docs "AdminPanelCorp/docs"
 	"AdminPanelCorp/server"
 
-	docs "AdminPanelCorp/docs"
+	//docs "AdminPanelCorp/docs"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -18,6 +19,10 @@ func AllRequests(route *gin.Engine, DB *sqlx.DB) {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	v1 := route.Group("/api/v1")
 	{
+		eg := v1.Group("/example")
+		{
+			eg.GET("/helloworld", server.Helloworld)
+		}
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/registration-form", handlerDB.SignUp)

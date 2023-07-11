@@ -1,4 +1,4 @@
-basePath: /
+basePath: /api/v1
 definitions:
   models.RegisterUser:
     properties:
@@ -22,13 +22,30 @@ definitions:
       username:
         type: string
     type: object
-host: localhost:8080
+host: localhost:80
 info:
   contact: {}
   description: API Server
   title: Admin Panel API
   version: "1.0"
 paths:
+  /api/v1/auth/sign-up:
+    get:
+      description: create account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: SignUp
+      tags:
+      - auth
   /auth/login-form:
     post:
       consumes:
@@ -108,44 +125,21 @@ paths:
       summary: SignUp
       tags:
       - auth
-  /auth/sign-in:
+  /example/helloworld:
     get:
       consumes:
       - application/json
-      description: login
+      description: do ping
       produces:
       - application/json
       responses:
         "200":
-          description: success
+          description: OK
           schema:
             type: string
-        "400":
-          description: error
-          schema:
-            type: string
-      summary: SignIn
+      summary: ping example
       tags:
-      - auth
-  /auth/sign-up:
-    get:
-      consumes:
-      - application/json
-      description: create account
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: success
-          schema:
-            type: string
-        "400":
-          description: error
-          schema:
-            type: string
-      summary: SignUp
-      tags:
-      - auth
+      - example
 securityDefinitions:
   ApiKeyAuth:
     in: header
