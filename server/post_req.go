@@ -15,14 +15,26 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// Функция для POST запроса регистрации
+// @BasePath /api/v1
+
+// PingExample godoc
+// @Summary SignUp
+// @Tags auth
+// @Description create account
+// @Accept json
+// @Produce json
+// @Param input body []models.RegisterUser true "account info"
+// @Success 200 {string} string "success"
+// @Failure 400 {string} string "error"
+// @Failure 500 {string} [][]string "error"
+// @Router /auth/registration-form [post]
 func (db *DataBase) SignUp(c *gin.Context) {
-	var user []models.User
+	var user []models.RegisterUser
 	var records [][]string
-	var errUsers []models.User
+	var errUsers []models.RegisterUser
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input body"})
 		return
 	}
 	for _, elem := range user {
@@ -36,12 +48,12 @@ func (db *DataBase) SignUp(c *gin.Context) {
 
 	data, emailError := useract.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
 	if emailError != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": emailError})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": emailError})
 	}
 
 	errMail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
 	if errMail != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": errMail})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": errMail})
 	}
 
 	if len(errUsers) > 0 {
@@ -54,7 +66,19 @@ func (db *DataBase) SignUp(c *gin.Context) {
 
 }
 
-// Функция для POST запроса авторизации
+// @BasePath /api/v1
+
+// PingExample godoc
+// @Summary SignIn
+// @Tags auth
+// @Description login
+// @Accept json
+// @Produce json
+// @Param input body models.User true "account info"
+// @Success 200 {string} string "success"
+// @Failure 400 {string} string "error"
+// @Failure 500 {string} string "error"
+// @Router /auth/login-form [post]
 func (db *DataBase) SignIn(c *gin.Context) {
 	var user models.User
 
@@ -122,7 +146,17 @@ func (db *DataBase) SignIn(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": "user logged in"})
 }
 
-// Функция для POST запроса выхода из сессии
+// @BasePath /api/v1
+
+// PingExample godoc
+// @Summary Logout
+// @Security ApiKeyAuth
+// @Tags auth
+// @Description logout
+// @Accept json
+// @Produce json
+// @Success 200 {string} string "success"
+// @Router /auth/logout-form [post]
 func Logout(c *gin.Context) {
 	c.Header("Authorization", "")
 	c.JSON(http.StatusOK, gin.H{"success": "user logged out"})

@@ -1,0 +1,154 @@
+basePath: /
+definitions:
+  models.RegisterUser:
+    properties:
+      email:
+        type: string
+      username:
+        type: string
+    type: object
+  models.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      password:
+        type: string
+      role:
+        items:
+          type: string
+        type: array
+      username:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API Server
+  title: Admin Panel API
+  version: "1.0"
+paths:
+  /auth/login-form:
+    post:
+      consumes:
+      - application/json
+      description: login
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: SignIn
+      tags:
+      - auth
+  /auth/logout-form:
+    post:
+      consumes:
+      - application/json
+      description: logout
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+      security:
+      - ApiKeyAuth: []
+      summary: Logout
+      tags:
+      - auth
+  /auth/registration-form:
+    post:
+      consumes:
+      - application/json
+      description: create account
+      parameters:
+      - description: account info
+        in: body
+        name: input
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/models.RegisterUser'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+        "500":
+          description: error
+          schema:
+            type: string
+      summary: SignUp
+      tags:
+      - auth
+  /auth/sign-in:
+    get:
+      consumes:
+      - application/json
+      description: login
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: SignIn
+      tags:
+      - auth
+  /auth/sign-up:
+    get:
+      consumes:
+      - application/json
+      description: create account
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            type: string
+        "400":
+          description: error
+          schema:
+            type: string
+      summary: SignUp
+      tags:
+      - auth
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
