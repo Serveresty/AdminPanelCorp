@@ -1,0 +1,9 @@
+MAIL=
+MAIL_PASSWORD=
+SECRET_KEY=mysecretkey
+Host=localhost
+Port=5432
+Username=postgres
+Password=abegah54
+DBName=postgres
+SSLMode=disable
