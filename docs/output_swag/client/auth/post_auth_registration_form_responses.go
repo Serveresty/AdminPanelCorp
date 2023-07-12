@@ -27,6 +27,12 @@ func (o *PostAuthRegistrationFormReader) ReadResponse(response runtime.ClientRes
 			return nil, err
 		}
 		return result, nil
+	case 303:
+		result := NewPostAuthRegistrationFormSeeOther()
+		if err := result.readResponse(response, consumer, o.formats); err != nil {
+			return nil, err
+		}
+		return nil, result
 	case 400:
 		result := NewPostAuthRegistrationFormBadRequest()
 		if err := result.readResponse(response, consumer, o.formats); err != nil {
@@ -101,6 +107,72 @@ func (o *PostAuthRegistrationFormOK) GetPayload() string {
 }
 
 func (o *PostAuthRegistrationFormOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// response payload
+	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
+		return err
+	}
+
+	return nil
+}
+
+// NewPostAuthRegistrationFormSeeOther creates a PostAuthRegistrationFormSeeOther with default headers values
+func NewPostAuthRegistrationFormSeeOther() *PostAuthRegistrationFormSeeOther {
+	return &PostAuthRegistrationFormSeeOther{}
+}
+
+/*
+PostAuthRegistrationFormSeeOther describes a response with status code 303, with default header values.
+
+error
+*/
+type PostAuthRegistrationFormSeeOther struct {
+	Payload string
+}
+
+// IsSuccess returns true when this post auth registration form see other response has a 2xx status code
+func (o *PostAuthRegistrationFormSeeOther) IsSuccess() bool {
+	return false
+}
+
+// IsRedirect returns true when this post auth registration form see other response has a 3xx status code
+func (o *PostAuthRegistrationFormSeeOther) IsRedirect() bool {
+	return true
+}
+
+// IsClientError returns true when this post auth registration form see other response has a 4xx status code
+func (o *PostAuthRegistrationFormSeeOther) IsClientError() bool {
+	return false
+}
+
+// IsServerError returns true when this post auth registration form see other response has a 5xx status code
+func (o *PostAuthRegistrationFormSeeOther) IsServerError() bool {
+	return false
+}
+
+// IsCode returns true when this post auth registration form see other response a status code equal to that given
+func (o *PostAuthRegistrationFormSeeOther) IsCode(code int) bool {
+	return code == 303
+}
+
+// Code gets the status code for the post auth registration form see other response
+func (o *PostAuthRegistrationFormSeeOther) Code() int {
+	return 303
+}
+
+func (o *PostAuthRegistrationFormSeeOther) Error() string {
+	return fmt.Sprintf("[POST /auth/registration-form][%d] postAuthRegistrationFormSeeOther  %+v", 303, o.Payload)
+}
+
+func (o *PostAuthRegistrationFormSeeOther) String() string {
+	return fmt.Sprintf("[POST /auth/registration-form][%d] postAuthRegistrationFormSeeOther  %+v", 303, o.Payload)
+}
+
+func (o *PostAuthRegistrationFormSeeOther) GetPayload() string {
+	return o.Payload
+}
+
+func (o *PostAuthRegistrationFormSeeOther) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {

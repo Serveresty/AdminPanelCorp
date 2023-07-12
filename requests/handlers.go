@@ -23,6 +23,7 @@ func AllRequests(route *gin.Engine, DB *sqlx.DB) {
 		{
 			eg.GET("/helloworld", server.Helloworld)
 		}
+
 		auth := v1.Group("/auth")
 		{
 			auth.POST("/registration-form", handlerDB.SignUp)
@@ -31,8 +32,12 @@ func AllRequests(route *gin.Engine, DB *sqlx.DB) {
 			auth.POST("/login-form", handlerDB.SignIn)
 			auth.POST("/logout-form", server.Logout)
 		}
-		v1.GET("/", handlerDB.HomePage)
-		v1.GET("/admin", handlerDB.AdminPanel)
+
+		pgs := v1.Group("/page")
+		{
+			pgs.GET("/homepage", handlerDB.HomePage)
+			pgs.GET("/admin", handlerDB.AdminPanel)
+		}
 		v1.POST("/edit-user", handlerDB.EditUser)
 		v1.POST("/add-role", handlerDB.AddRole)
 		v1.POST("/delete-role", handlerDB.DeleteRole)

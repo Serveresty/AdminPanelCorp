@@ -55,6 +55,11 @@ PostAuthLoginFormOK describes a response with status code 200, with default head
 success
 */
 type PostAuthLoginFormOK struct {
+
+	/* Authorization
+	 */
+	Authorization string
+
 	Payload string
 }
 
@@ -102,6 +107,13 @@ func (o *PostAuthLoginFormOK) GetPayload() string {
 
 func (o *PostAuthLoginFormOK) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
 
+	// hydrates response header Authorization
+	hdrAuthorization := response.GetHeader("Authorization")
+
+	if hdrAuthorization != "" {
+		o.Authorization = hdrAuthorization
+	}
+
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {
 		return err
@@ -121,6 +133,11 @@ PostAuthLoginFormBadRequest describes a response with status code 400, with defa
 error
 */
 type PostAuthLoginFormBadRequest struct {
+
+	/* Authorization
+	 */
+	Authorization string
+
 	Payload string
 }
 
@@ -167,6 +184,13 @@ func (o *PostAuthLoginFormBadRequest) GetPayload() string {
 }
 
 func (o *PostAuthLoginFormBadRequest) readResponse(response runtime.ClientResponse, consumer runtime.Consumer, formats strfmt.Registry) error {
+
+	// hydrates response header Authorization
+	hdrAuthorization := response.GetHeader("Authorization")
+
+	if hdrAuthorization != "" {
+		o.Authorization = hdrAuthorization
+	}
 
 	// response payload
 	if err := consumer.Consume(response.Body(), &o.Payload); err != nil && err != io.EOF {

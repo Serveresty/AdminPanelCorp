@@ -30,7 +30,9 @@ type ClientOption func(*runtime.ClientOperation)
 
 // ClientService is the interface for Client methods
 type ClientService interface {
-	GetAPIV1AuthSignUp(params *GetAPIV1AuthSignUpParams, opts ...ClientOption) (*GetAPIV1AuthSignUpOK, error)
+	GetAuthSignIn(params *GetAuthSignInParams, opts ...ClientOption) (*GetAuthSignInOK, error)
+
+	GetAuthSignUp(params *GetAuthSignUpParams, opts ...ClientOption) (*GetAuthSignUpOK, error)
 
 	PostAuthLoginForm(params *PostAuthLoginFormParams, opts ...ClientOption) (*PostAuthLoginFormOK, error)
 
@@ -42,24 +44,24 @@ type ClientService interface {
 }
 
 /*
-GetAPIV1AuthSignUp signs up
+GetAuthSignIn pings auth
 
-create account
+SignIn page
 */
-func (a *Client) GetAPIV1AuthSignUp(params *GetAPIV1AuthSignUpParams, opts ...ClientOption) (*GetAPIV1AuthSignUpOK, error) {
+func (a *Client) GetAuthSignIn(params *GetAuthSignInParams, opts ...ClientOption) (*GetAuthSignInOK, error) {
 	// TODO: Validate the params before sending
 	if params == nil {
-		params = NewGetAPIV1AuthSignUpParams()
+		params = NewGetAuthSignInParams()
 	}
 	op := &runtime.ClientOperation{
-		ID:                 "GetAPIV1AuthSignUp",
+		ID:                 "GetAuthSignIn",
 		Method:             "GET",
-		PathPattern:        "/api/v1/auth/sign-up",
+		PathPattern:        "/auth/sign-in",
 		ProducesMediaTypes: []string{"application/json"},
 		ConsumesMediaTypes: []string{"application/json"},
 		Schemes:            []string{"http"},
 		Params:             params,
-		Reader:             &GetAPIV1AuthSignUpReader{formats: a.formats},
+		Reader:             &GetAuthSignInReader{formats: a.formats},
 		Context:            params.Context,
 		Client:             params.HTTPClient,
 	}
@@ -71,13 +73,53 @@ func (a *Client) GetAPIV1AuthSignUp(params *GetAPIV1AuthSignUpParams, opts ...Cl
 	if err != nil {
 		return nil, err
 	}
-	success, ok := result.(*GetAPIV1AuthSignUpOK)
+	success, ok := result.(*GetAuthSignInOK)
 	if ok {
 		return success, nil
 	}
 	// unexpected success response
 	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
-	msg := fmt.Sprintf("unexpected success response for GetAPIV1AuthSignUp: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	msg := fmt.Sprintf("unexpected success response for GetAuthSignIn: API contract not enforced by server. Client expected to get an error, but got: %T", result)
+	panic(msg)
+}
+
+/*
+GetAuthSignUp pings auth
+
+SignUp page
+*/
+func (a *Client) GetAuthSignUp(params *GetAuthSignUpParams, opts ...ClientOption) (*GetAuthSignUpOK, error) {
+	// TODO: Validate the params before sending
+	if params == nil {
+		params = NewGetAuthSignUpParams()
+	}
+	op := &runtime.ClientOperation{
+		ID:                 "GetAuthSignUp",
+		Method:             "GET",
+		PathPattern:        "/auth/sign-up",
+		ProducesMediaTypes: []string{"application/json"},
+		ConsumesMediaTypes: []string{"application/json"},
+		Schemes:            []string{"http"},
+		Params:             params,
+		Reader:             &GetAuthSignUpReader{formats: a.formats},
+		Context:            params.Context,
+		Client:             params.HTTPClient,
+	}
+	for _, opt := range opts {
+		opt(op)
+	}
+
+	result, err := a.transport.Submit(op)
+	if err != nil {
+		return nil, err
+	}
+	success, ok := result.(*GetAuthSignUpOK)
+	if ok {
+		return success, nil
+	}
+	// unexpected success response
+	// safeguard: normally, absent a default response, unknown success responses return an error above: so this is a codegen issue
+	msg := fmt.Sprintf("unexpected success response for GetAuthSignUp: API contract not enforced by server. Client expected to get an error, but got: %T", result)
 	panic(msg)
 }
 

@@ -25,6 +25,7 @@ import (
 // @Produce json
 // @Param input body []models.RegisterUser true "account info"
 // @Success 200 {string} string "success"
+// @Failure 303 {string} []models.RegisterUser "error"
 // @Failure 400 {string} string "error"
 // @Failure 500 {string} [][]string "error"
 // @Router /auth/registration-form [post]
@@ -34,7 +35,7 @@ func (db *DataBase) SignUp(c *gin.Context) {
 	var errUsers []models.RegisterUser
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input body"})
+		c.JSON(http.StatusBadRequest, "invalid input body")
 		return
 	}
 	for _, elem := range user {
@@ -48,20 +49,21 @@ func (db *DataBase) SignUp(c *gin.Context) {
 
 	data, emailError := useract.CreateUsers(db.Data, records) //Отправка данных на создание пользователей
 	if emailError != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": emailError})
+		c.JSON(http.StatusInternalServerError, emailError)
 	}
 
 	errMail := utils.SendEmail(data) //Отправление готовых данных в отправку сообщений на почты
 	if errMail != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": errMail})
+		c.JSON(http.StatusInternalServerError, errMail)
 	}
 
 	if len(errUsers) > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user already registered", "error_data": errUsers})
+		c.JSON(http.StatusBadRequest, "user already registered: \n")
+		c.JSON(http.StatusSeeOther, errUsers)
 	}
 
 	if len(records) > 0 {
-		c.JSON(http.StatusOK, gin.H{"success": "user has been registered"})
+		c.JSON(http.StatusOK, "user has been registered")
 	}
 
 }
@@ -78,43 +80,44 @@ func (db *DataBase) SignUp(c *gin.Context) {
 // @Success 200 {string} string "success"
 // @Failure 400 {string} string "error"
 // @Failure 500 {string} string "error"
+// @Header 200,400,default {string} Authorization "Authorization"
 // @Router /auth/login-form [post]
 func (db *DataBase) SignIn(c *gin.Context) {
 	var user models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, "error binding")
 		return
 	}
 
 	//Проверка на существование пользователя
 	if !useract.IsUserRegistered(db.Data, user.Email, user.Username) {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "user doesn't registered"})
+		c.JSON(http.StatusBadRequest, "user doesn't registered")
 		return
 	}
 	//Проверка на соответствие паролей в БД с введенным пользователем
 	if err := database.CheckPassword(db.Data, user.Email, user.Password); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "wrong password"})
+		c.JSON(http.StatusBadRequest, "wrong password")
 		return
 	}
 
 	getuser := "select user_id, username from users_data where users_data.email=$1"
 	row, err := db.Data.Query(getuser, user.Email)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		c.JSON(http.StatusInternalServerError, err)
 		return
 	}
 	defer row.Close()
 	for row.Next() {
 		if err := row.Scan(&user.Id, &user.Username); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			c.JSON(http.StatusInternalServerError, err)
 			return
 		}
 	}
 
 	roles, errRoles := roleact.GetUsersRoles(db.Data, user.Id)
 	if errRoles != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": errRoles})
+		c.JSON(http.StatusInternalServerError, errRoles)
 		return
 	}
 	user.Role = roles
@@ -136,14 +139,14 @@ func (db *DataBase) SignIn(c *gin.Context) {
 	//Кодирование токена по ключу
 	tokenString, err := token.SignedString([]byte(env.GetEnv("SECRET_KEY")))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "could not generate token"})
+		c.JSON(http.StatusInternalServerError, "could not generate token")
 		return
 	}
 
 	bearer := "Bearer " + tokenString
 	c.Header("Authorization", bearer)
 
-	c.JSON(http.StatusOK, gin.H{"success": "user logged in"})
+	c.JSON(http.StatusOK, "user logged in")
 }
 
 // @BasePath /api/v1
@@ -158,8 +161,18 @@ func (db *DataBase) SignIn(c *gin.Context) {
 // @Success 200 {string} string "success"
 // @Router /auth/logout-form [post]
 func Logout(c *gin.Context) {
+	claims, errStr := parseInfoFromToken(c)
+	if errStr != "" {
+		c.JSON(http.StatusBadRequest, "unauthorized")
+		return
+	}
+
+	if len(claims.StandardClaims.Subject) == 0 {
+		c.JSON(http.StatusUnauthorized, "unauthorized")
+		return
+	}
 	c.Header("Authorization", "")
-	c.JSON(http.StatusOK, gin.H{"success": "user logged out"})
+	c.JSON(http.StatusOK, "user logged out")
 	c.Redirect(http.StatusFound, "/sign-in")
 }
 

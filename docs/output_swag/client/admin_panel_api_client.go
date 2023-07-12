@@ -12,6 +12,7 @@ import (
 
 	"AdminPanelCorp/docs/output_swag/client/auth"
 	"AdminPanelCorp/docs/output_swag/client/example"
+	"AdminPanelCorp/docs/output_swag/client/page"
 )
 
 // Default admin panel API HTTP client.
@@ -20,7 +21,7 @@ var Default = NewHTTPClient(nil)
 const (
 	// DefaultHost is the default Host
 	// found in Meta (info) section of spec file
-	DefaultHost string = "localhost:80"
+	DefaultHost string = "localhost:8080"
 	// DefaultBasePath is the default BasePath
 	// found in Meta (info) section of spec file
 	DefaultBasePath string = "/api/v1"
@@ -58,6 +59,7 @@ func New(transport runtime.ClientTransport, formats strfmt.Registry) *AdminPanel
 	cli.Transport = transport
 	cli.Auth = auth.New(transport, formats)
 	cli.Example = example.New(transport, formats)
+	cli.Page = page.New(transport, formats)
 	return cli
 }
 
@@ -106,6 +108,8 @@ type AdminPanelAPI struct {
 
 	Example example.ClientService
 
+	Page page.ClientService
+
 	Transport runtime.ClientTransport
 }
 
@@ -114,4 +118,5 @@ func (c *AdminPanelAPI) SetTransport(transport runtime.ClientTransport) {
 	c.Transport = transport
 	c.Auth.SetTransport(transport)
 	c.Example.SetTransport(transport)
+	c.Page.SetTransport(transport)
 }

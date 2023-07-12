@@ -24,58 +24,95 @@ func Helloworld(g *gin.Context) {
 
 // Главная страница при GET запросе
 
+// @BasePath /api/v1
+
+// PingExample godoc
+// @Summary ping page
+// @Security ApiKeyAuth
+// @Schemes
+// @Description home page
+// @Tags page
+// @Accept json
+// @Produce json
+// @Success 202 {string} Access granted
+// @Failure 400,401 {string} Access denied
+// @Header 200,400,default {string} Authorization "Authorization"
+// @Router /page/homepage [get]
 func (db *DataBase) HomePage(c *gin.Context) {
 	claims, errStr := parseInfoFromToken(c)
 	if errStr != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusBadRequest, "unauthorized")
 		return
 	}
 
 	if len(claims.StandardClaims.Subject) == 0 {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusUnauthorized, "unauthorized")
 	}
 
-	c.JSON(http.StatusAccepted, gin.H{"message": "access granted"})
+	c.JSON(http.StatusAccepted, "access granted")
 }
 
-// Страница авторизации при GET запросе
+// PingExample godoc
+// @Summary ping auth
+// @Schemes
+// @Description SignIn page
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Success 200 {string} AccessGranted
+// @Failure 400 {string} AccessDenied
+// @Router /auth/sign-in [get]
 func (db *DataBase) SignInPage(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 
 	if token != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "already authorized"})
+		c.JSON(http.StatusBadRequest, "already authorized")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
+	c.JSON(http.StatusOK, "access granted")
 }
 
 // Страница регистрации при GET запросе
 
 // PingExample godoc
-// @Summary SignUp
+// @Summary ping auth
+// @Schemes
+// @Description SignUp page
 // @Tags auth
-// @Description create account
+// @Accept json
 // @Produce json
-// @Success 200 {string} string "success"
-// @Failure 400 {string} string "error"
-// @Router /api/v1/auth/sign-up [get]
+// @Success 200 {string} AccessGranted
+// @Failure 400 {string} AccessDenied
+// @Router /auth/sign-up [get]
 func (db *DataBase) SignUpPage(c *gin.Context) {
 	token := c.GetHeader("Authorization")
 
 	if token != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "already authorized"})
+		c.JSON(http.StatusBadRequest, "already authorized")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
+	c.JSON(http.StatusOK, "access granted")
 }
 
 // Функция для GET запроса на Админ Панель
+// @Security ApiKeyAuth
+// PingExample godoc
+// @Summary ping page
+// @Schemes
+// @Description Admin page
+// @Tags page
+// @Accept json
+// @Produce json
+// @Success 200 {string} Access granted
+// @Failure 400,403,500 {string} Access denied
+// @Header 200,400,403,500,default {string} Authorization "Authorization"
+// @Router /page/admin [get]
 func (db *DataBase) AdminPanel(c *gin.Context) {
 	var access bool
 
 	claims, errStr := parseInfoFromToken(c)
 	if errStr != "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		c.JSON(http.StatusBadRequest, "unauthorized")
 		return
 	}
 
@@ -86,16 +123,16 @@ func (db *DataBase) AdminPanel(c *gin.Context) {
 	}
 
 	if !access {
-		c.JSON(http.StatusForbidden, gin.H{"error": "No rights to access this page"})
+		c.JSON(http.StatusForbidden, "No rights to access this page")
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "access granted"})
+	c.JSON(http.StatusOK, "access granted")
 
 	allUsersData, err3 := useract.GetAllUsers(db.Data)
 
 	if err3 != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "error while parsing users from db"})
+		c.JSON(http.StatusInternalServerError, "error while parsing users from db")
 	}
 
 	c.JSON(http.StatusOK, allUsersData)
