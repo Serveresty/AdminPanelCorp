@@ -43,17 +43,17 @@ func main() {
 		fmt.Println("--------------Scenario1--------------")
 		err1 := swagger_tests.Scenario1(clientt)
 		if err1 != nil {
-			fmt.Println(err1)
+			fmt.Println(err1.Error())
 		}
 		fmt.Println("--------------Scenario2--------------")
 		err2 := swagger_tests.Scenario2(clientt)
 		if err2 != nil {
-			fmt.Println(err1)
+			fmt.Println(err2.Error())
 		}
 		fmt.Println("--------------Scenario3--------------")
 		err3 := swagger_tests.Scenario3(clientt)
 		if err3 != nil {
-			fmt.Println(err1)
+			fmt.Println(err3.Error())
 		}
 	}()
 
